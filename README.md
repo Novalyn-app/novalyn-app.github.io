@@ -3,11 +3,12 @@
 The public marketing site for **Novalyn**, a Chrome extension that bulk-relists
 your own Vinted listings.
 
-Plain static HTML and CSS — **no build step**, no CI. GitHub Pages serves the
-root of the `main` branch directly:
+**Live: https://novalyn-app.github.io/**
 
-> Repo **Settings → Pages → Build and deployment → Source: Deploy from a branch**
-> → Branch: **main** → Folder: **/ (root)** → Save.
+Plain static HTML and CSS — **no build step**, no CI, and no Pages settings to
+touch. This repo is named `<org>.github.io`, so GitHub publishes its default
+branch root automatically. Push to `main` and the site updates in about a
+minute.
 
 ## Pages
 
@@ -23,8 +24,8 @@ root of the `main` branch directly:
 
 ## Editing
 
-Edit the HTML/CSS and push to `main` — GitHub republishes in about a minute.
-The support address is `support.novalyn@gmail.com`.
+Edit the HTML/CSS and push to `main`. The support address is
+`support.novalyn@gmail.com`.
 
 ---
 
