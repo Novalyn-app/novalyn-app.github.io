@@ -3,8 +3,11 @@
 The public marketing site for **Novalyn**, a Chrome extension that bulk-relists
 your own Vinted listings.
 
-Plain static HTML and CSS — **no build step**. Every push to `main` deploys the
-folder to GitHub Pages via [`.github/workflows/pages.yml`](.github/workflows/pages.yml).
+Plain static HTML and CSS — **no build step**, no CI. GitHub Pages serves the
+root of the `main` branch directly:
+
+> Repo **Settings → Pages → Build and deployment → Source: Deploy from a branch**
+> → Branch: **main** → Folder: **/ (root)** → Save.
 
 ## Pages
 
@@ -20,8 +23,8 @@ folder to GitHub Pages via [`.github/workflows/pages.yml`](.github/workflows/pag
 
 ## Editing
 
-Just edit the HTML/CSS and push — no tooling required. Support address is
-`support.novalyn@gmail.com`.
+Edit the HTML/CSS and push to `main` — GitHub republishes in about a minute.
+The support address is `support.novalyn@gmail.com`.
 
 ---
 
