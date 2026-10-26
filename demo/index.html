@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Try the Novalyn popup — live demo, no install</title>
+  <meta name="description" content="Click through the real Novalyn popup with sample data: listings, archive, results and records. Nothing is connected to Vinted." />
+  <link rel="icon" type="image/png" href="../assets/icon-128.png" />
+  <link rel="stylesheet" href="../styles.css" />
+  <meta name="robots" content="noindex" />
+  <style>
+    .demo-page { padding: 54px 0 90px; }
+    .demo-page h1 { font-size: clamp(1.7rem, 3.6vw, 2.3rem); }
+    .demo-notes { max-width: 780px; margin: 0 auto 30px; }
+    .demo-notes .notice { margin-top: 20px; }
+    .demo-side { display: grid; grid-template-columns: 450px 1fr; gap: 48px; align-items: start; }
+    @media (max-width: 900px) { .demo-side { grid-template-columns: 1fr; gap: 28px; } }
+    .demo-side h2 { font-size: 1.1rem; margin-top: 0; }
+    .demo-side ul { padding-left: 20px; color: var(--ink-soft); font-size: 0.95rem; }
+    .demo-side li { margin-bottom: 9px; }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="../index.html"><img src="../assets/icon-128.png" alt="" /><span>Novalyn</span></a>
+      <nav class="nav" aria-label="Main">
+        <a href="../index.html#safe">Why it is safe</a>
+        <a href="../relist-vinted.html">How relisting works</a>
+        <a class="btn btn--primary btn--sm" href="https://chromewebstore.google.com/detail/novalyn-%E2%80%94-vinted-relister/flnfapmkkmegfpbakndnlgehimpfccic">Add to Chrome</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="demo-page">
+    <div class="wrap">
+      <div class="demo-notes center">
+        <span class="eyebrow"><span class="dot"></span> The real popup · sample data · nothing connected to Vinted</span>
+        <h1>Click around before you install anything</h1>
+        <p class="lede" style="margin:0 auto">
+          This is the shipped extension, running on sample listings. Pick a tab, tick an item,
+          look at the Archive. No account, no install, and nothing you press here reaches Vinted.
+        </p>
+      </div>
+
+      <div class="demo-bar">
+        <span class="small muted" style="margin-right:4px">Language</span>
+        <button class="chip" data-lang="en" aria-pressed="true">English</button>
+        <button class="chip" data-lang="nl" aria-pressed="false">Nederlands</button>
+        <button class="chip" data-lang="fr" aria-pressed="false">Français</button>
+        <button class="chip" data-lang="de" aria-pressed="false">Deutsch</button>
+        <button class="chip" data-lang="es" aria-pressed="false">Español</button>
+        <button class="chip" data-lang="it" aria-pressed="false">Italiano</button>
+      </div>
+      <div class="demo-bar" style="margin-bottom:26px">
+        <span class="small muted" style="margin-right:4px">Look</span>
+        <button class="chip" data-theme="light" aria-pressed="true">Light</button>
+        <button class="chip" data-theme="dark" aria-pressed="false">Dark</button>
+      </div>
+
+      <div class="demo-side">
+        <div class="demo-shell">
+          <div class="demo-frame">
+            <iframe id="demoFrame" title="Novalyn popup demo" src="harness/popup.html?lang=en&amp;theme=light&amp;hint=1"></iframe>
+          </div>
+        </div>
+
+        <div>
+          <h2>What to try</h2>
+          <ul>
+            <li><strong>Listings</strong> — tick two items and press <em>Relist</em>. Nothing happens on purpose: a demo that pretended to change your wardrobe would be a lie.</li>
+            <li><strong>Archive</strong> — the backup of every original, with a restore button. This is what makes a failed relist recoverable.</li>
+            <li><strong>Results</strong> — views per day before and after a relist, and the ads that are not improving.</li>
+            <li><strong>Automation</strong> — a prepared run waiting for approval, which is the default for a reason.</li>
+            <li><strong>Settings</strong> — including the dark appearance for Vinted's own pages.</li>
+          </ul>
+
+          <h2 style="margin-top:28px">The Records page</h2>
+          <p class="small" style="color:var(--ink-soft)">
+            Sales, costs and profit open in a full tab, so they are easier to look at on their own:
+          </p>
+          <p><a class="btn btn--ghost btn--sm" href="harness/options.html?theme=light">Open the Records page →</a></p>
+
+          <div class="notice" style="margin-top:22px">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+            <p>
+              <strong>This is a demo.</strong> The listings, prices and sales are sample data, and
+              the screen is answering from a stub instead of a Vinted tab. Install the extension
+              to use it on your own wardrobe.
+            </p>
+          </div>
+
+          <p style="margin-top:22px">
+            <a class="btn btn--primary" href="https://chromewebstore.google.com/detail/novalyn-%E2%80%94-vinted-relister/flnfapmkkmegfpbakndnlgehimpfccic">Add to Chrome — 50 relists free</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="demo-toast" id="demoToast" role="status" aria-live="polite"></div>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-bottom" style="border-top:0;margin-top:0;padding-top:0">
+        <span>&copy; 2026 Novalyn. All rights reserved.</span>
+        <span><a href="../index.html">Back to the site</a></span>
+      </div>
+      <p class="disclaimer">
+        Novalyn is an independent tool and is not affiliated with, endorsed by, or sponsored by
+        Vinted. The demo uses sample data and is not connected to any Vinted account.
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var frame = document.getElementById('demoFrame');
+      var state = { lang: 'en', theme: 'light' };
+
+      function src() {
+        return 'harness/popup.html?lang=' + state.lang + '&theme=' + state.theme + '&hint=1';
+      }
+      function render() {
+        frame.src = src();
+        document.querySelectorAll('[data-lang]').forEach(function (b) {
+          b.setAttribute('aria-pressed', String(b.dataset.lang === state.lang));
+        });
+        document.querySelectorAll('[data-theme]').forEach(function (b) {
+          b.setAttribute('aria-pressed', String(b.dataset.theme === state.theme));
+        });
+        var q = '?lang=' + state.lang + '&theme=' + state.theme;
+        history.replaceState(null, '', q);
+      }
+
+      document.querySelectorAll('[data-lang]').forEach(function (b) {
+        b.addEventListener('click', function () { state.lang = b.dataset.lang; render(); });
+      });
+      document.querySelectorAll('[data-theme]').forEach(function (b) {
+        b.addEventListener('click', function () { state.theme = b.dataset.theme; render(); });
+      });
+
+      // The harness tells us when a real action was attempted, so the page can
+      // say "sample data" instead of leaving the visitor guessing.
+      var toast = document.getElementById('demoToast');
+      var timer;
+      window.addEventListener('message', function (event) {
+        if (!event.data || !event.data.novalynDemo) return;
+        toast.textContent = 'Demo only — nothing was sent to Vinted and nothing in your wardrobe changed.';
+        toast.classList.add('show');
+        clearTimeout(timer);
+        timer = setTimeout(function () { toast.classList.remove('show'); }, 4200);
+      });
+
+      var params = new URLSearchParams(location.search);
+      if (['en', 'nl', 'fr', 'de', 'es', 'it'].indexOf(params.get('lang')) !== -1) state.lang = params.get('lang');
+      if (params.get('theme') === 'dark') state.theme = 'dark';
+      render();
+    })();
+  </script>
+</body>
+</html>

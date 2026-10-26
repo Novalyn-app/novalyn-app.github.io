@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="robots" content="noindex">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novalyn</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="brand">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 32 32" width="30" height="30" role="img">
+                        <defs>
+                            <linearGradient id="nvGrad" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0" stop-color="#4F46E5"/>
+                                <stop offset="1" stop-color="#7C3AED"/>
+                            </linearGradient>
+                        </defs>
+                        <rect x="0" y="0" width="32" height="32" rx="7" fill="url(#nvGrad)"/>
+                        <path d="M10.9 9 L10.9 23 M10.9 9 L21.1 23 M21.1 9 L21.1 23"
+                              stroke="#ffffff" stroke-width="2.7" stroke-linecap="round" fill="none"/>
+                        <path d="M25 4.3 L25.7 6.3 L27.7 7 L25.7 7.7 L25 9.7 L24.3 7.7 L22.3 7 L24.3 6.3 Z"
+                              fill="#FDE68A"/>
+                    </svg>
+                </span>
+                <span class="brand-text">
+                    <h1>Novalyn</h1>
+                    <span class="brand-tagline" data-i18n="app.tagline">Bulk relist for Vinted</span>
+                </span>
+            </div>
+            
+        </header>
+
+        <!-- Not-signed-in state. Deliberately loud: without a session nothing
+             can be read or relisted, so a small grey badge was too easy to miss. -->
+        <div id="loginBanner" class="login-banner" role="alert" hidden>
+            <span class="login-banner-icon" aria-hidden="true">!</span>
+            <div class="login-banner-body">
+                <strong id="loginBannerTitle"></strong>
+                <span id="loginBannerText" class="login-banner-text"></span>
+            </div>
+            <div class="login-banner-actions">
+                <button id="btnLoginAction" class="btn btn-danger btn-tiny" type="button"></button>
+                <button id="btnLoginRecheck" class="btn btn-secondary btn-tiny" type="button" data-i18n="login.check">Check again</button>
+            </div>
+        </div>
+        
+        <div class="status-bar">
+            <span id="loginStatus" class="status-badge" data-i18n="status.checking">Checking...</span>
+            <button id="btnOpenRecords" class="btn btn-secondary btn-tiny" data-i18n="btn.openRecords">Records</button>
+            <button id="btnOpenVinted" class="btn btn-secondary btn-tiny" data-i18n="btn.openVinted">Open Vinted</button>
+            <button id="btnOpenSite" class="btn btn-secondary btn-tiny" data-i18n="site.open" data-i18n-title="site.hint" title="Help, pricing and privacy">Website</button>
+        </div>
+
+        <div class="license-bar">
+            <span id="licenseStatus" class="license-status">—</span>
+            <button id="btnUpgrade" class="btn btn-primary btn-tiny" data-i18n="license.upgradeCta">Upgrade</button>
+        </div>
+
+        <div id="health" class="health" hidden>
+            <span id="healthDot" class="health-dot"></span>
+            <span id="healthText" class="health-text"></span>
+            <span id="healthMeta" class="health-meta"></span>
+            <button id="btnPreflight" class="health-link" data-i18n="preflight.check">Check</button>
+        </div>
+
+        <div id="rateWarning" class="rate-warning" style="display: none;"></div>
+        
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="listings" data-i18n="tab.listings">Listings</button>
+            <button class="tab-btn" data-tab="batch" data-i18n="tab.batch">Batch</button>
+            <button class="tab-btn" data-tab="automation" data-i18n="tab.automation">Automation</button>
+            <button class="tab-btn" data-tab="results" data-i18n="tab.results">Results</button>
+            <button class="tab-btn" data-tab="history" data-i18n="tab.history">History</button>
+            <button class="tab-btn" data-tab="archive" data-i18n="tab.archive">Archive</button>
+            <button class="tab-btn" data-tab="settings" data-i18n="tab.settings">Settings</button>
+            
+        </div>
+        
+        <div class="tab-content active" id="tab-listings">
+            <div class="actions">
+                <button id="btnFetchListings" class="btn btn-secondary" data-i18n="btn.fetch">Fetch My Listings</button>
+                <button id="btnBulkRelist" class="btn btn-primary" data-i18n="btn.bulkRelist">Relist</button>
+                <button id="btnSmartRelist" class="btn btn-secondary" hidden></button>
+                <button id="btnClearListings" class="btn btn-secondary" data-i18n="btn.clear">Clear</button>
+            </div>
+
+            <!-- The weekly action list: the measurements turned into one task.
+                 Hidden whenever there is nothing measured to act on, so a fresh
+                 install and a healthy wardrobe both see no panel at all. -->
+            <div id="weeklyPanel" class="weekly-panel" hidden>
+                <div class="weekly-head">
+                    <strong data-i18n="weekly.title">This week</strong>
+                    <span id="weeklyCount" class="weekly-count"></span>
+                </div>
+                <ul id="weeklyList" class="weekly-list"></ul>
+                <p id="weeklySummary" class="weekly-summary" hidden></p>
+            </div>
+
+            <!-- Learned from the user's own relist history; hidden until there is
+                 enough evidence to say anything (see core/besttime.ts). -->
+            <div id="bestTimeHint" class="best-time" hidden></div>
+            
+            <!-- First-run hint. Dismissible, remembered in `settings.onboardingSeen`
+                 so it appears exactly once per install: a permanent "how to" panel
+                 would just push the actual work down the popup. -->
+            <div id="onboardingHint" class="onboarding-hint" hidden>
+                <div class="onboarding-text">
+                    <strong data-i18n="onboarding.title">How it works</strong>
+                    <span id="checklistProgress" class="checklist-progress"></span>
+                    <ul id="checklist" class="checklist"></ul>
+                    <span class="onboarding-warn" data-i18n="onboarding.warn">Check the filters first, so you only relist what you intended to.</span>
+                </div>
+                <button id="btnDismissOnboarding" class="onboarding-dismiss" data-i18n-title="onboarding.dismissTitle" title="Dismiss" type="button">×</button>
+            </div>
+
+            <!-- Free relists, right where the decision is made. The bar in the
+                 header carries the same number; this one is in the context of
+                 picking items, and only nags when it is nearly gone. -->
+            <div id="freeRelists" class="free-relists" hidden></div>
+            
+            <!-- The filter row used to open with "All statuses", which reads like a
+                 section label rather than the value of the first dropdown. A heading
+                 names the area; the option keeps its real meaning ("no status filter"). -->
+            <div class="filter-head">
+                <span data-i18n="filter.title">Filters</span>
+            </div>
+
+            <div class="filters">
+                <input id="filterSearch" type="text" data-i18n-placeholder="filter.search.placeholder" placeholder="Search title…" data-i18n-title="filter.search.title" title="Search titles">
+            </div>
+
+            <div class="filters">
+                <select id="filterStatus" data-i18n-title="filter.status.title" title="Filter by status">
+                    <option value="all" data-i18n="filter.allStatuses">All statuses</option>
+                    <option value="active" data-i18n="status.active">Active</option>
+                    <option value="sold" data-i18n="status.sold">Sold</option>
+                    <option value="reserved" data-i18n="status.reserved">Reserved</option>
+                    <option value="hidden" data-i18n="status.hidden">Hidden</option>
+                    <option value="draft" data-i18n="status.draft">Draft</option>
+                    <option value="under_review" data-i18n="status.under_review">Under review</option>
+                    <option value="archived" data-i18n="status.archived">Archived</option>
+                </select>
+                <select id="filterViews" data-i18n-title="filter.views.title" title="Filter by views">
+                    <option value="all" data-i18n="filter.views.all">All views</option>
+                    <option value="zero" data-i18n="filter.views.zero">0 views</option>
+                    <option value="low" data-i18n="filter.views.low">Under 10 views</option>
+                    <option value="never" data-i18n="filter.views.never">Not read yet</option>
+                </select>
+                <select id="filterSort" data-i18n-title="filter.sort.title" title="Sort">
+                    <option value="default" data-i18n="sort.default">Default order</option>
+                    <option value="date-asc" data-i18n="sort.dateAsc">Oldest first</option>
+                    <option value="date-desc" data-i18n="sort.dateDesc">Newest first</option>
+                    <option value="price-asc" data-i18n="sort.priceAsc">Price ↑</option>
+                    <option value="price-desc" data-i18n="sort.priceDesc">Price ↓</option>
+                    <option value="views-desc" data-i18n="sort.viewsDesc">Most views</option>
+                    <option value="views-asc" data-i18n="sort.viewsAsc">Fewest views</option>
+                    <option value="favs-desc" data-i18n="sort.favsDesc">Most favourites</option>
+                    <option value="title-asc" data-i18n="sort.titleAsc">Title A–Z</option>
+                </select>
+            </div>
+            
+            <div class="price-rule">
+                <label for="priceMode" data-i18n="price.label">Price change</label>
+                <select id="priceMode">
+                    <option value="none" data-i18n="price.none">No change</option>
+                    <option value="percent" data-i18n="price.percent">Adjust by %</option>
+                    <option value="fixed" data-i18n="price.fixed">Set fixed price</option>
+                </select>
+                <input id="priceValue" type="number" step="0.01" min="0" data-i18n-placeholder="price.value.placeholder" placeholder="0" data-i18n-title="price.value.title" title="Percentage (e.g. -10) or fixed price">
+            </div>
+            
+            <div class="actions">
+                <button id="btnSelectAll" class="btn btn-secondary" data-i18n="btn.selectAll">Select All</button>
+                <button id="btnDeselectAll" class="btn btn-secondary" data-i18n="btn.deselectAll">Deselect All</button>
+                <button id="btnSelectOpportunities" class="btn btn-secondary" hidden></button>
+                <button id="btnExportListings" class="btn btn-secondary" data-i18n="btn.exportListings">Export</button>
+                <button id="btnExportCrosslist" class="btn btn-secondary" data-i18n="crosslist.button">Export for cross-listing</button>
+            </div>
+
+            <!-- Photo quality of the current selection. Shown only when it applies:
+                 an ad with one photo converts badly, and the moment to notice is
+                 before relisting it, not after wondering why it did not sell. -->
+            <div id="photoWarning" class="photo-warning" hidden></div>
+            <div id="duplicateWarning" class="photo-warning duplicate-warning" hidden></div>
+            
+            <div class="listings-info">
+                <span id="listingsCount">0 listings</span>
+                <span id="selectedCount">0 selected</span>
+                <span id="listingsUpdatedAt" class="listings-updated"></span>
+            </div>
+            
+            <div id="listingsList" class="listings-list">
+                <div class="empty-state" data-i18n="listings.empty">No listings loaded. Click "Fetch My Listings" to import your Vinted items.</div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="tab-batch">
+            <div class="batch-form">
+                <div class="form-group">
+                    <label for="delayBetween" data-i18n="batch.delayLabel">Delay between listings</label>
+                    <div class="delay-row">
+                        <input type="number" id="delayBetween" min="1" max="120" value="60">
+                        <select id="delayUnit" data-i18n-title="batch.delayUnitTitle" title="Delay unit">
+                            <option value="seconds" data-i18n="batch.unit.seconds">Seconds</option>
+                            <option value="minutes" data-i18n="batch.unit.minutes">Minutes</option>
+                        </select>
+                    </div>
+                    <div id="delayHint" class="field-hint" data-i18n="batch.delayHint">A longer gap is safer. Vinted starts watching accounts that relist in quick bursts.</div>
+                    <div id="delayWarning" class="field-warning" style="display: none;"></div>
+                </div>
+                
+                <div id="rateUsage" class="rate-usage"></div>
+
+                <div class="batch-actions">
+                    <button id="btnCreateBatch" class="btn btn-primary" data-i18n="btn.createBatch">Create Batch</button>
+                </div>
+            </div>
+            
+            <div id="batchInfo" class="batch-info" style="display: none;">
+                <div class="batch-stats">
+                    <div><span data-i18n="batch.progress">Progress:</span> <span id="batchProgress">0/0</span></div>
+                    <div><span data-i18n="batch.status">Status:</span> <span id="batchStatus">idle</span></div>
+                    <div id="batchNextRow" class="batch-next" style="display: none;">
+                        <span data-i18n="batch.nextAction">Next action:</span>
+                        <span id="batchCountdown"></span>
+                    </div>
+                </div>
+                
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+                </div>
+                
+                <div class="batch-controls">
+                    <button id="btnStartBatch" class="btn btn-success" data-i18n="btn.start">Start</button>
+                    <button id="btnPauseBatch" class="btn btn-warning" data-i18n="btn.pause">Pause</button>
+                    <button id="btnResumeBatch" class="btn btn-success" data-i18n="btn.resume">Resume</button>
+                    <button id="btnCancelBatch" class="btn btn-danger" data-i18n="btn.cancel">Cancel</button>
+                </div>
+
+                <div class="batch-clear">
+                    <button id="btnClearBatch" class="btn btn-secondary" data-i18n="btn.clearBatch">Clear</button>
+                    <button id="btnClearAllBatches" class="btn btn-danger" data-i18n="btn.clearAllBatches" style="display: none;">Clear all batches</button>
+                </div>
+            </div>
+            
+            <div id="batchJobs" class="batch-jobs"></div>
+
+            <!-- What just happened, when there is something to report or retry. -->
+            <div id="batchSummary" class="batch-summary" hidden>
+                <div id="batchSummaryText" class="batch-summary-text"></div>
+                <button id="btnRetryFailed" class="btn btn-secondary btn-tiny" hidden></button>
+            </div>
+
+            <!-- What relisting actually did. Sits under the batch because it answers
+                 the question the batch raises ("did that help?"), and it stays empty
+                 until there is something measured to say. -->
+            <div id="impactSummary" class="impact-summary" hidden></div>
+        </div>
+
+        <div class="tab-content" id="tab-results">
+            <div class="results-head">
+                <div class="period-toggle" id="resultsPeriod" role="group">
+                    <button class="period-btn active" data-results-period="30" data-i18n="results.period.30">30 days</button>
+                    <button class="period-btn" data-results-period="90" data-i18n="results.period.90">90 days</button>
+                    <button class="period-btn" data-results-period="all" data-i18n="results.period.all">All time</button>
+                </div>
+            </div>
+            <div class="results-stats">
+                <div class="results-stat">
+                    <span class="results-value" id="resultsRelisted">—</span>
+                    <span class="results-label" data-i18n="results.relisted">Renewed</span>
+                </div>
+                <div class="results-stat">
+                    <span class="results-value" id="resultsMeasured">—</span>
+                    <span class="results-label" data-i18n="results.measured">Measured</span>
+                </div>
+                <div class="results-stat">
+                    <span class="results-value" id="resultsLift">—</span>
+                    <span class="results-label" data-i18n="results.medianLift">Median change</span>
+                </div>
+            </div>
+            <label class="switch-label results-toggle">
+                <input type="checkbox" id="skipUnhelpful">
+                <span data-i18n="results.stopSuggest">Don't suggest renewing ads that stopped improving</span>
+            </label>
+            <p class="setting-desc" data-i18n="results.stopSuggestHint">After two renewals without more views per day, the radar leaves the ad alone. Off by default.</p>
+            <div id="resultsList" class="results-list"></div>
+        </div>
+        
+        <div class="tab-content" id="tab-history">
+            <div class="history-actions">
+                <button id="btnClearHistory" class="btn btn-danger" data-i18n="btn.clearHistory">Clear History</button>
+            </div>
+            <div id="historyList" class="history-list"></div>
+        </div>
+        
+        <div class="tab-content" id="tab-archive">
+            <p class="capture-hint" data-i18n="archive.hint">
+                A full backup of each listing is archived automatically before it is relisted or
+                destroyed. If an ad gets lost, restore it to the list and relist it again.
+            </p>
+            <div class="history-actions">
+                <button id="btnClearArchive" class="btn btn-danger" data-i18n="btn.clearArchive">Clear Archive</button>
+            </div>
+            <div id="archiveList" class="history-list"></div>
+        </div>
+        
+        <div class="tab-content" id="tab-settings">
+            <div class="form-group">
+                <label for="languageSelect" data-i18n="settings.language">Language</label>
+                <select id="languageSelect">
+                    <option value="auto" data-i18n="settings.language.auto">Auto (detect browser language)</option>
+                    <option value="en">English</option>
+                    <option value="nl">Nederlands</option>
+                    <option value="fr">Français</option>
+                    <option value="de">Deutsch</option>
+                    <option value="es">Español</option>
+                    <option value="it">Italiano</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="themeSelect" data-i18n="settings.theme">Theme</label>
+                <select id="themeSelect">
+                    <option value="auto" data-i18n="settings.theme.auto">Auto (follow system)</option>
+                    <option value="light" data-i18n="settings.theme.light">Light</option>
+                    <option value="dark" data-i18n="settings.theme.dark">Dark</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <!-- A second, separate theme control: `themeSelect` styles this
+                     extension's own UI, this one restyles Vinted's pages. Kept
+                     apart on purpose so nobody toggles the wrong one. -->
+                <label for="vintedThemeSelect" data-i18n="settings.vintedTheme">Vinted pages</label>
+                <select id="vintedThemeSelect">
+                    <option value="off" data-i18n="settings.vintedTheme.off">Normal (light)</option>
+                    <option value="dark" data-i18n="settings.vintedTheme.dark">Dark</option>
+                    <option value="auto" data-i18n="settings.vintedTheme.auto">Match system</option>
+                </select>
+                <p class="setting-desc" data-i18n="settings.vintedTheme.hint">Changes only how Vinted pages look. Photos keep their real colours.</p>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="autoRetry"> <span data-i18n="settings.autoRetry">Auto-retry on failure</span>
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="stopOnFirstFailure"> <span data-i18n="settings.stopOnFirstFailure">Stop batch on first failure (testing/safety mode)</span>
+                </label>
+            </div>
+            <div class="form-group">
+                <label for="maxRetries" data-i18n="settings.maxRetries">Max retries</label>
+                <input type="number" id="maxRetries" min="0" max="10" value="3">
+            </div>
+            <div class="form-group">
+                <label for="retryDelay" data-i18n="settings.retryDelay">Retry delay (seconds)</label>
+                <input type="number" id="retryDelay" min="1" max="60" value="5">
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="rateLimitEnabled"> <span data-i18n="settings.rateLimitEnabled">Warn me before relisting too much (recommended)</span>
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="digestEnabled"> <span data-i18n="settings.digest">Send a weekly summary of stale ads</span>
+                </label>
+                <p class="setting-desc" data-i18n="settings.digestHint">One notification a week with the ads that get no views or have not been relisted in a while.</p>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="showBatchConfirm"> <span data-i18n="settings.showBatchConfirm">Show a summary before starting a batch</span>
+                </label>
+            </div>
+            <div class="form-group">
+                <label class="switch-label">
+                    <input type="checkbox" id="vacationMode"> <span data-i18n="vacation.enable">Pause relisting until</span>
+                </label>
+                <input type="date" id="vacationDate">
+                <p class="setting-desc" data-i18n="vacation.hint">No new batches and no automatic plans until this date. Records and history keep working.</p>
+                <p id="vacationStatus" class="setting-desc" hidden></p>
+            </div>
+            <div class="form-group">
+                <label data-i18n="backup.title">Backup &amp; restore</label>
+                <div class="actions">
+                    <button id="btnBackup" class="btn btn-secondary btn-tiny" data-i18n="backup.export">Export backup</button>
+                    <button id="btnRestore" class="btn btn-secondary btn-tiny" data-i18n="backup.import">Restore backup</button>
+                    <input type="file" id="restoreFile" accept=".json,application/json" hidden>
+                </div>
+                <p class="setting-desc" data-i18n="backup.hint">Listings, records, activity, traction and automation rules - never your licence or free-trial counter.</p>
+                <p id="backupStatus" class="setting-desc" hidden></p>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="showLauncher"> <span data-i18n="settings.showLauncher">Show the Novalyn button on Vinted pages</span>
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="photoVariance"> <span data-i18n="settings.photoVariance">Slightly vary re-uploaded photos (harder to match)</span>
+                </label>
+            </div>
+            <div class="form-group">
+                <label for="rateWarnPerHour" data-i18n="settings.rateWarnPerHour">Warn after (relists per hour)</label>
+                <input type="number" id="rateWarnPerHour" min="1" max="1000" value="15">
+            </div>
+            <div class="form-group">
+                <label for="rateBlockPerHour" data-i18n="settings.rateBlockPerHour">Pause after (relists per hour)</label>
+                <input type="number" id="rateBlockPerHour" min="1" max="1000" value="30">
+            </div>
+            <div class="form-group">
+                <label for="rateWarnPerDay" data-i18n="settings.rateWarnPerDay">Warn after (relists per day)</label>
+                <input type="number" id="rateWarnPerDay" min="1" max="10000" value="60">
+            </div>
+            <div class="form-group">
+                <label for="rateBlockPerDay" data-i18n="settings.rateBlockPerDay">Pause after (relists per day)</label>
+                <input type="number" id="rateBlockPerDay" min="1" max="10000" value="150">
+            </div>
+            <p class="capture-hint" data-i18n="settings.rateHint">
+                These are conservative estimates, not official Vinted limits. Relisting too
+                much in a short time is a common cause of temporary blocks. Lower them for
+                extra caution, or untick the box to turn the warnings and auto-pause off.
+            </p>
+            <button id="btnSaveSettings" class="btn btn-primary" data-i18n="btn.saveSettings">Save Settings</button>
+
+            <section class="whats-new">
+                <div class="whats-new-head">
+                    <h2 data-i18n="whatsnew.title">What's new</h2>
+                    <span class="whats-new-version" id="whatsNewVersion">v0.37.5</span>
+                </div>
+                <p class="whats-new-note" data-i18n="whatsnew.english">Release notes are in English.</p>
+                <div id="whatsNewLatest" class="whats-new-latest"></div>
+                <details id="whatsNewHistory" class="whats-new-history" hidden>
+                    <summary data-i18n="whatsnew.history">Earlier versions</summary>
+                    <div id="whatsNewHistoryList" class="whats-new-history-list"></div>
+                </details>
+            </section>
+        </div>
+
+        <div class="tab-content" id="tab-automation">
+            <div class="automation-head">
+                <label class="switch-label">
+                    <input type="checkbox" id="automationEnabled">
+                    <span data-i18n="auto.master">Enable automation</span>
+                </label>
+                <p class="capture-hint" data-i18n="auto.hint">
+                    Automation prepares a relist plan on a schedule. Nothing is relisted until you
+                    approve it, unless you turn approval off for a rule.
+                </p>
+                <p class="automation-warn" data-i18n="auto.warn">
+                    Automation only runs while Chrome is open. Recurring relisting raises the risk
+                    of a Vinted block — keep the limits conservative.
+                </p>
+            </div>
+
+            <div id="pendingPlan" class="automation-plan" style="display: none;"></div>
+
+            <div class="automation-section-head">
+                <span data-i18n="auto.rules">Rules</span>
+                <button id="btnNewRule" class="btn btn-secondary btn-tiny" data-i18n="auto.newRule">New rule</button>
+            </div>
+            <div id="rulesList" class="automation-list"></div>
+
+            <div id="ruleEditor" class="rule-editor" style="display: none;">
+                <div class="form-group">
+                    <label for="ruleName" data-i18n="auto.field.name">Name</label>
+                    <input type="text" id="ruleName" maxlength="60">
+                </div>
+                <div class="form-group">
+                    <label data-i18n="auto.field.statuses">Include statuses</label>
+                    <div class="checkbox-grid" id="ruleStatuses">
+                        <label><input type="checkbox" value="active" checked> <span data-i18n="status.active">Active</span></label>
+                        <label><input type="checkbox" value="sold"> <span data-i18n="status.sold">Sold</span></label>
+                        <label><input type="checkbox" value="reserved"> <span data-i18n="status.reserved">Reserved</span></label>
+                        <label><input type="checkbox" value="hidden"> <span data-i18n="status.hidden">Hidden</span></label>
+                        <label><input type="checkbox" value="draft"> <span data-i18n="status.draft">Draft</span></label>
+                        <label><input type="checkbox" value="under_review"> <span data-i18n="status.under_review">Under review</span></label>
+                        <label><input type="checkbox" value="archived"> <span data-i18n="status.archived">Archived</span></label>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="ruleOlderThan" data-i18n="auto.field.olderThan">Older than (days)</label>
+                        <input type="number" id="ruleOlderThan" min="0" max="3650" value="30">
+                    </div>
+                    <div class="form-group">
+                        <label for="ruleCooldown" data-i18n="auto.field.cooldown">Cooldown (days since last relist)</label>
+                        <input type="number" id="ruleCooldown" min="0" max="3650" value="14">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="ruleMinPrice" data-i18n="auto.field.minPrice">Minimum price (optional)</label>
+                        <input type="number" id="ruleMinPrice" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="ruleSearch" data-i18n="auto.field.search">Title contains (optional)</label>
+                        <input type="text" id="ruleSearch" maxlength="120">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="ruleCadence" data-i18n="auto.field.cadence">Schedule</label>
+                    <select id="ruleCadence">
+                        <option value="daily" data-i18n="auto.cadence.daily">Daily</option>
+                        <option value="weekly" data-i18n="auto.cadence.weekly">Weekly</option>
+                        <option value="interval" data-i18n="auto.cadence.interval">Every N hours</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="ruleTime" data-i18n="auto.field.time">At time</label>
+                        <input type="time" id="ruleTime" value="10:00">
+                    </div>
+                    <div class="form-group" id="ruleEveryRow" style="display: none;">
+                        <label for="ruleEveryHours" data-i18n="auto.field.everyHours">Every (hours)</label>
+                        <input type="number" id="ruleEveryHours" min="1" max="168" value="24">
+                    </div>
+                </div>
+                <div class="form-group" id="ruleDaysRow" style="display: none;">
+                    <label data-i18n="auto.field.days">Days</label>
+                    <div class="day-grid" id="ruleDays">
+                        <label><input type="checkbox" value="0"> <span data-i18n="auto.day.sun">Sun</span></label>
+                        <label><input type="checkbox" value="1"> <span data-i18n="auto.day.mon">Mon</span></label>
+                        <label><input type="checkbox" value="2"> <span data-i18n="auto.day.tue">Tue</span></label>
+                        <label><input type="checkbox" value="3"> <span data-i18n="auto.day.wed">Wed</span></label>
+                        <label><input type="checkbox" value="4"> <span data-i18n="auto.day.thu">Thu</span></label>
+                        <label><input type="checkbox" value="5"> <span data-i18n="auto.day.fri">Fri</span></label>
+                        <label><input type="checkbox" value="6"> <span data-i18n="auto.day.sat">Sat</span></label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="auto.field.window">Allowed hours</label>
+                    <div class="delay-row">
+                        <input type="number" id="ruleWindowStart" min="0" max="23" value="9">
+                        <span class="muted" data-i18n="auto.field.windowTo">to</span>
+                        <input type="number" id="ruleWindowEnd" min="0" max="24" value="21">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="ruleMaxPerRun" data-i18n="auto.field.maxPerRun">Max per run</label>
+                        <input type="number" id="ruleMaxPerRun" min="1" max="100" value="5">
+                    </div>
+                    <div class="form-group">
+                        <label for="ruleMaxPerDay" data-i18n="auto.field.maxPerDay">Max per day</label>
+                        <input type="number" id="ruleMaxPerDay" min="1" max="1000" value="20">
+                    </div>
+                    <div class="form-group">
+                        <label for="ruleGap" data-i18n="auto.field.gap">Gap between relists (seconds)</label>
+                        <input type="number" id="ruleGap" min="5" max="3600" value="90">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="rulePriority" data-i18n="auto.field.priority">Priority (higher = planned first)</label>
+                    <input type="number" id="rulePriority" min="0" max="99" value="0">
+                </div>
+                <div class="form-group">
+                    <label for="rulePriceMode" data-i18n="auto.field.priceMode">Price change</label>
+                    <select id="rulePriceMode">
+                        <option value="none" data-i18n="auto.price.none">Keep price</option>
+                        <option value="percent" data-i18n="auto.price.percent">Reduce by %</option>
+                        <option value="fixed" data-i18n="auto.price.fixed">Set fixed price</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="rulePriceValue" data-i18n="auto.field.priceValue">Value</label>
+                        <input type="number" id="rulePriceValue" min="0" step="0.01" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="ruleFloor" data-i18n="auto.field.floor">Never below (optional)</label>
+                        <input type="number" id="ruleFloor" min="0" step="0.01">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="ruleStepPerCycle">
+                        <span data-i18n="auto.field.stepPerCycle">Increase the reduction each relist cycle</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="ruleRequireApproval" checked>
+                        <span data-i18n="auto.field.requireApproval">Ask for my approval before running</span>
+                    </label>
+                </div>
+                <div id="ruleMatchPreview" class="automation-preview"></div>
+                <div class="actions">
+                    <button id="btnSaveRule" class="btn btn-primary" data-i18n="auto.saveRule">Save rule</button>
+                    <button id="btnPlanNow" class="btn btn-secondary" data-i18n="auto.rule.planNow">Plan now</button>
+                    <button id="btnCancelRule" class="btn btn-secondary" data-i18n="btn.cancel">Cancel</button>
+                </div>
+            </div>
+
+            <div class="automation-section-head">
+                <span data-i18n="auto.runs">Recent runs</span>
+                <span class="automation-section-actions">
+                    <button id="btnExportRunsJson" class="btn btn-secondary btn-tiny" data-i18n="auto.export.json">Export JSON</button>
+                    <button id="btnExportRunsCsv" class="btn btn-secondary btn-tiny" data-i18n="auto.export.csv">Export CSV</button>
+                </span>
+            </div>
+            <div id="runsList" class="automation-list"></div>
+        </div>
+
+        
+    </div>
+    
+    <div id="confirmSheet" class="sheet" hidden>
+        <div class="sheet-card" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+            <h3 id="sheetTitle" class="sheet-title"></h3>
+            <div id="sheetBody" class="sheet-body"></div>
+            <label class="sheet-skip"><input type="checkbox" id="sheetSkip"> <span data-i18n="sheet.skip">Don't ask again</span></label>
+            <div class="sheet-actions">
+                <button id="sheetCancel" class="btn btn-secondary" data-i18n="btn.cancelSheet">Cancel</button>
+                <button id="sheetConfirm" class="btn btn-success" data-i18n="btn.start">Start</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cross-listing export. Asks only for what cannot be inferred from the
+         ads themselves: which eBay site (it sets the currency of every price),
+         an optional single category id, and an optional price change. eBay's
+         free bulk tool takes the resulting file as a "Create new drafts" CSV. -->
+    <div id="crosslistSheet" class="sheet" hidden>
+        <div class="sheet-card" role="dialog" aria-modal="true" aria-labelledby="crosslistTitle">
+            <h3 id="crosslistTitle" class="sheet-title" data-i18n="crosslist.title">Export for cross-listing</h3>
+            <div class="sheet-body">
+                <p id="crosslistScope"></p>
+                <label class="sheet-field">
+                    <span data-i18n="crosslist.platform">Format</span>
+                    <select id="crosslistPlatform">
+                        <option value="ebay" data-i18n="crosslist.platform.ebay">eBay drafts (CSV)</option>
+                        <option value="generic" data-i18n="crosslist.platform.generic">Generic CSV</option>
+                    </select>
+                </label>
+                <label class="sheet-field crosslist-ebay-only">
+                    <span data-i18n="crosslist.market">eBay site</span>
+                    <select id="crosslistMarket"
+                            data-i18n-title="crosslist.marketTitle"
+                            title="The eBay site your selling account is on — the file must be uploaded there"></select>
+                </label>
+                <label class="sheet-field">
+                    <span data-i18n="crosslist.markup">Price change (%)</span>
+                    <input id="crosslistMarkup" type="number" step="1" value="0"
+                           data-i18n-title="crosslist.markupTitle"
+                           title="Percentage added to every price; negative values lower it">
+                </label>
+                <label class="sheet-field crosslist-ebay-only">
+                    <span data-i18n="crosslist.category">Category ID</span>
+                    <input id="crosslistCategory" type="text" inputmode="numeric" autocomplete="off"
+                           data-i18n-placeholder="crosslist.categoryPlaceholder" placeholder="e.g. 15709"
+                           title="One eBay category id for every row — required by eBay">
+                </label>
+                <label class="sheet-field crosslist-ebay-only">
+                    <span data-i18n="crosslist.type">Type</span>
+                    <input id="crosslistType" type="text" autocomplete="off" list="crosslistTypeSuggestions"
+                           data-i18n-placeholder="crosslist.typePlaceholder" placeholder="e.g. Athletic Shoes"
+                           data-i18n-title="crosslist.typeTitle"
+                           title="Optional: fills the Type item specific on every row">
+                    <datalist id="crosslistTypeSuggestions"></datalist>
+                </label>
+                <label class="sheet-skip"><input type="checkbox" id="crosslistImages" checked> <span data-i18n="crosslist.images">Include photo URLs</span></label>
+                <p id="crosslistWarn" class="crosslist-warn" hidden></p>
+                <p id="crosslistHint" class="sheet-hint"></p>
+            </div>
+            <div class="sheet-actions">
+                <button id="crosslistCancel" class="btn btn-secondary" data-i18n="btn.cancel">Cancel</button>
+                <button id="crosslistDownload" class="btn btn-primary" data-i18n="crosslist.download">Download CSV</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+(function () {
+  var D = {"settings":{"autoRetry":true,"stopOnFirstFailure":false,"maxRetries":3,"retryDelay":5,"delayBetween":12,"delayUnit":"seconds","rateLimitEnabled":true,"rateWarnPerHour":15,"rateWarnPerDay":60,"rateBlockPerHour":30,"rateBlockPerDay":150,"showLauncher":false,"photoVariance":true,"language":"en","theme":"dark"},"listings":{"48200100":{"id":"48200100","title":"Wool coat, camel — size M","description":"","price":48,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRTlFNEY5Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRDZDREYzIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNNzQsNTAgTDEwMCw0MiBMMTI2LDUwIEwxNDYsNjQgTDE0NiwxNjIgUTEwMCwxNzAgNTQsMTYyIEw1NCw2NCBaIiBmaWxsPSIjNkQ1QkQwIiBvcGFjaXR5PSIwLjkiLz48cGF0aCBkPSJNOTIsNDggTDEwMCw3MiBMMTA4LDQ4IFoiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuNTUiLz48L3N2Zz4="],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"active","createdAt":1792870441422,"currency":"EUR"},"48200107":{"id":"48200107","title":"Denim jacket, vintage wash","description":"","price":32,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRENFOEY4Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjQzJENkYxIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNNzQsNTQgTDEwMCw0NiBMMTI2LDU0IEwxNDIsNjYgTDE0MiwxNDIgUTEwMCwxNTAgNTgsMTQyIEw1OCw2NiBaIiBmaWxsPSIjNEE2RkE1IiBvcGFjaXR5PSIwLjkiLz48cGF0aCBkPSJNOTAsNTAgTDEwMCw3MCBMMTEwLDUwIFoiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuNTUiLz48L3N2Zz4="],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"active","createdAt":1792611241422,"currency":"EUR"},"48200114":{"id":"48200114","title":"Leather ankle boots, EU 39","description":"","price":39,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRjJFNkRCIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRTJEMEJFIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNNzgsNDYgTDEwOCw0NiBMMTA4LDEwNCBRMTE2LDExMiAxMzgsMTE4IFExNDgsMTI0IDE0NCwxMzggTDc0LDEzOCBRNjgsMTI4IDc0LDExNiBaIiBmaWxsPSIjOEE2QTRGIiBvcGFjaXR5PSIwLjkiLz48cGF0aCBkPSJNNzQsMTMwIEwxNDQsMTMwIEwxNDQsMTM4IEw3NCwxMzggWiIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC41NSIvPjwvc3ZnPg=="],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"active","createdAt":1792265641422,"currency":"EUR"},"48200121":{"id":"48200121","title":"Knit sweater, cream","description":"","price":18.5,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRjhFRkUxIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRUZERkM5Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNNzgsNTAgTDEwMCw0NCBMMTIyLDUwIEwxNDYsNjIgTDE1MiwxMTAgTDEzNCwxMTQgTDEyOCw4OCBMMTI4LDE0OCBRMTAwLDE1NCA3MiwxNDggTDcyLDg4IEw2NiwxMTQgTDQ4LDExMCBMNTQsNjIgWiIgZmlsbD0iI0E5ODM0RiIgb3BhY2l0eT0iMC45Ii8+PC9zdmc+"],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"active","createdAt":1791833641422,"currency":"EUR"},"48200128":{"id":"48200128","title":"Floral summer dress, size S","description":"","price":22,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRkFFMUU5Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRjFDOUQ3Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNODYsNDggTDEwMCw0NCBMMTE0LDQ4IEwxMTEsNzQgTDEzNywxNTIgUTEwMCwxNjIgNjMsMTUyIEw4OSw3NCBaIiBmaWxsPSIjQjA1QTc5IiBvcGFjaXR5PSIwLjkiLz48cGF0aCBkPSJNODYsNzQgTDExNCw3NCBMMTEyLDg0IEw4OCw4NCBaIiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjU1Ii8+PC9zdmc+"],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"sold","createdAt":1791228841422,"currency":"EUR"},"48200135":{"id":"48200135","title":"Silk scarf, navy","description":"","price":14,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjREVFRUYxIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjQzRFMEU1Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNNTgsNTQgUTEwMCw3MiAxNDIsNTQgTDE0Miw3NiBRMTAwLDk0IDU4LDc2IFoiIGZpbGw9IiMzRjdGOEEiIG9wYWNpdHk9IjAuOSIvPjxwYXRoIGQ9Ik04NCw4MCBMOTIsODAgTDg4LDE0OCBMODAsMTQ4IFogTTExMiw4MCBMMTIwLDgwIEwxMTYsMTQ4IEwxMDgsMTQ4IFoiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuNTUiLz48L3N2Zz4="],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"hidden","createdAt":1790451241422,"currency":"EUR"},"48200142":{"id":"48200142","title":"Canvas sneakers, EU 42","description":"","price":25,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRTdFQUYwIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRDJEOEUxIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNNTgsMTAwIFE2NCw4MiA4NCw4MiBMOTIsOTQgUTEwOCw4NCAxMjQsOTYgUTE0NCwxMTAgMTQ0LDEyNCBMNTgsMTI0IFoiIGZpbGw9IiM1QTY0NzIiIG9wYWNpdHk9IjAuOSIvPjxwYXRoIGQ9Ik01OCwxMTggTDE0NCwxMTggTDE0NCwxMjQgTDU4LDEyNCBaIiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjU1Ii8+PC9zdmc+"],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"draft","createdAt":1789587241422,"currency":"EUR"},"48200149":{"id":"48200149","title":"Linen shirt, white","description":"","price":20,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRjBGMEY1Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjREZERkU5Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNNzYsNTAgTDEwMCw0NCBMMTI0LDUwIEwxNDIsNjIgTDE0OCwxMDQgTDEzMiwxMDggTDEyOCw4NCBMMTI4LDE0OCBRMTAwLDE1NCA3MiwxNDggTDcyLDg0IEw2OCwxMDggTDUyLDEwNCBMNTgsNjIgWiIgZmlsbD0iIzZCNkI3QiIgb3BhY2l0eT0iMC45Ii8+PHBhdGggZD0iTTkyLDQ4IEwxMDAsNjYgTDEwOCw0OCBaIE0xMDAsODAgTDEwMCwxNDAgTDk2LDE0MCBMOTYsODAgWiIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC41NSIvPjwvc3ZnPg=="],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"active","createdAt":1788291241422,"currency":"EUR"}},"batches":{"b-2401":{"id":"b-2401","status":"running","progress":5,"total":6,"delayBetween":12,"startedAt":1793040721422,"nextRelistAt":1793043248422,"jobs":[{"listingId":"48200100","retryCount":0,"status":"completed"},{"listingId":"48200107","retryCount":0,"status":"completed"},{"listingId":"48200114","retryCount":0,"status":"completed"},{"listingId":"48200121","retryCount":0,"status":"completed"},{"listingId":"48200128","retryCount":0,"status":"completed"},{"listingId":"48200135","retryCount":0,"status":"running"}]}},"history":[{"id":"h-0","listingId":"48200100","originalListing":{"id":"48200100","title":"Wool coat, camel — size M","description":"","price":48,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRTlFNEY5Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRDZDREYzIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNNzQsNTAgTDEwMCw0MiBMMTI2LDUwIEwxNDYsNjQgTDE0NiwxNjIgUTEwMCwxNzAgNTQsMTYyIEw1NCw2NCBaIiBmaWxsPSIjNkQ1QkQwIiBvcGFjaXR5PSIwLjkiLz48cGF0aCBkPSJNOTIsNDggTDEwMCw3MiBMMTA4LDQ4IFoiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuNTUiLz48L3N2Zz4="],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"active","createdAt":1792870441422,"currency":"EUR"},"newListingId":"99000000","timestamp":1793043241422,"success":true},{"id":"h-1","listingId":"48200107","originalListing":{"id":"48200107","title":"Denim jacket, vintage wash","description":"","price":32,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRENFOEY4Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjQzJENkYxIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNNzQsNTQgTDEwMCw0NiBMMTI2LDU0IEwxNDIsNjYgTDE0MiwxNDIgUTEwMCwxNTAgNTgsMTQyIEw1OCw2NiBaIiBmaWxsPSIjNEE2RkE1IiBvcGFjaXR5PSIwLjkiLz48cGF0aCBkPSJNOTAsNTAgTDEwMCw3MCBMMTEwLDUwIFoiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuNTUiLz48L3N2Zz4="],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"active","createdAt":1792611241422,"currency":"EUR"},"newListingId":"99000001","timestamp":1793032441422,"success":true},{"id":"h-2","listingId":"48200114","originalListing":{"id":"48200114","title":"Leather ankle boots, EU 39","description":"","price":39,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRjJFNkRCIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRTJEMEJFIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNNzgsNDYgTDEwOCw0NiBMMTA4LDEwNCBRMTE2LDExMiAxMzgsMTE4IFExNDgsMTI0IDE0NCwxMzggTDc0LDEzOCBRNjgsMTI4IDc0LDExNiBaIiBmaWxsPSIjOEE2QTRGIiBvcGFjaXR5PSIwLjkiLz48cGF0aCBkPSJNNzQsMTMwIEwxNDQsMTMwIEwxNDQsMTM4IEw3NCwxMzggWiIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC41NSIvPjwvc3ZnPg=="],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"active","createdAt":1792265641422,"currency":"EUR"},"newListingId":"99000002","timestamp":1793021641422,"success":true},{"id":"h-3","listingId":"48200121","originalListing":{"id":"48200121","title":"Knit sweater, cream","description":"","price":18.5,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRjhFRkUxIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRUZERkM5Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNNzgsNTAgTDEwMCw0NCBMMTIyLDUwIEwxNDYsNjIgTDE1MiwxMTAgTDEzNCwxMTQgTDEyOCw4OCBMMTI4LDE0OCBRMTAwLDE1NCA3MiwxNDggTDcyLDg4IEw2NiwxMTQgTDQ4LDExMCBMNTQsNjIgWiIgZmlsbD0iI0E5ODM0RiIgb3BhY2l0eT0iMC45Ii8+PC9zdmc+"],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"active","createdAt":1791833641422,"currency":"EUR"},"newListingId":"99000003","timestamp":1793010841422,"success":true},{"id":"h-4","listingId":"48200128","originalListing":{"id":"48200128","title":"Floral summer dress, size S","description":"","price":22,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRkFFMUU5Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRjFDOUQ3Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNODYsNDggTDEwMCw0NCBMMTE0LDQ4IEwxMTEsNzQgTDEzNywxNTIgUTEwMCwxNjIgNjMsMTUyIEw4OSw3NCBaIiBmaWxsPSIjQjA1QTc5IiBvcGFjaXR5PSIwLjkiLz48cGF0aCBkPSJNODYsNzQgTDExNCw3NCBMMTEyLDg0IEw4OCw4NCBaIiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjU1Ii8+PC9zdmc+"],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"sold","createdAt":1791228841422,"currency":"EUR"},"newListingId":"99000004","timestamp":1793000041422,"success":true},{"id":"h-5","listingId":"48200135","originalListing":{"id":"48200135","title":"Silk scarf, navy","description":"","price":14,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjREVFRUYxIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjQzRFMEU1Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNNTgsNTQgUTEwMCw3MiAxNDIsNTQgTDE0Miw3NiBRMTAwLDk0IDU4LDc2IFoiIGZpbGw9IiMzRjdGOEEiIG9wYWNpdHk9IjAuOSIvPjxwYXRoIGQ9Ik04NCw4MCBMOTIsODAgTDg4LDE0OCBMODAsMTQ4IFogTTExMiw4MCBMMTIwLDgwIEwxMTYsMTQ4IEwxMDgsMTQ4IFoiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuNTUiLz48L3N2Zz4="],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"hidden","createdAt":1790451241422,"currency":"EUR"},"newListingId":"99000005","timestamp":1792989241422,"success":true}],"archive":[{"id":"a-0","listingId":"48200100","listing":{"id":"48200100","title":"Wool coat, camel — size M","description":"","price":48,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRTlFNEY5Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRDZDREYzIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNNzQsNTAgTDEwMCw0MiBMMTI2LDUwIEwxNDYsNjQgTDE0NiwxNjIgUTEwMCwxNzAgNTQsMTYyIEw1NCw2NCBaIiBmaWxsPSIjNkQ1QkQwIiBvcGFjaXR5PSIwLjkiLz48cGF0aCBkPSJNOTIsNDggTDEwMCw3MiBMMTA4LDQ4IFoiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuNTUiLz48L3N2Zz4="],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"active","createdAt":1792870441422,"currency":"EUR"},"archivedAt":1793043241422,"reason":"before-relist"},{"id":"a-1","listingId":"48200107","listing":{"id":"48200107","title":"Denim jacket, vintage wash","description":"","price":32,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRENFOEY4Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjQzJENkYxIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNNzQsNTQgTDEwMCw0NiBMMTI2LDU0IEwxNDIsNjYgTDE0MiwxNDIgUTEwMCwxNTAgNTgsMTQyIEw1OCw2NiBaIiBmaWxsPSIjNEE2RkE1IiBvcGFjaXR5PSIwLjkiLz48cGF0aCBkPSJNOTAsNTAgTDEwMCw3MCBMMTEwLDUwIFoiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuNTUiLz48L3N2Zz4="],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"active","createdAt":1792611241422,"currency":"EUR"},"archivedAt":1793021641422,"reason":"before-relist"},{"id":"a-2","listingId":"48200114","listing":{"id":"48200114","title":"Leather ankle boots, EU 39","description":"","price":39,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRjJFNkRCIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRTJEMEJFIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNNzgsNDYgTDEwOCw0NiBMMTA4LDEwNCBRMTE2LDExMiAxMzgsMTE4IFExNDgsMTI0IDE0NCwxMzggTDc0LDEzOCBRNjgsMTI4IDc0LDExNiBaIiBmaWxsPSIjOEE2QTRGIiBvcGFjaXR5PSIwLjkiLz48cGF0aCBkPSJNNzQsMTMwIEwxNDQsMTMwIEwxNDQsMTM4IEw3NCwxMzggWiIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC41NSIvPjwvc3ZnPg=="],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"active","createdAt":1792265641422,"currency":"EUR"},"archivedAt":1793000041422,"reason":"before-relist"},{"id":"a-3","listingId":"48200121","listing":{"id":"48200121","title":"Knit sweater, cream","description":"","price":18.5,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRjhFRkUxIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRUZERkM5Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNNzgsNTAgTDEwMCw0NCBMMTIyLDUwIEwxNDYsNjIgTDE1MiwxMTAgTDEzNCwxMTQgTDEyOCw4OCBMMTI4LDE0OCBRMTAwLDE1NCA3MiwxNDggTDcyLDg4IEw2NiwxMTQgTDQ4LDExMCBMNTQsNjIgWiIgZmlsbD0iI0E5ODM0RiIgb3BhY2l0eT0iMC45Ii8+PC9zdmc+"],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"active","createdAt":1791833641422,"currency":"EUR"},"archivedAt":1792978441422,"reason":"before-relist"}],"automation":{"enabled":true,"lineage":{"48200100":{"lastRelistedAt":1792784041422,"cycles":1,"rootId":"49000000","preViews":34,"preViewsAt":1789241641422},"48200107":{"lastRelistedAt":1792524841422,"cycles":2,"rootId":"49000001","preViews":19,"preViewsAt":1789241641422},"48200114":{"lastRelistedAt":1792092841422,"cycles":3,"rootId":"49000002","preViews":61,"preViewsAt":1787600041422}},"rules":[{"id":"r-1","name":"Stale stock — every 3 weeks","enabled":true,"target":{"statuses":["active"],"olderThanDays":30,"cooldownDays":14},"cadence":{"type":"daily","time":"10:00"},"window":{"startHour":9,"endHour":21},"limits":{"maxPerRun":5,"maxPerDay":20,"minGapSec":90},"price":{"mode":"percent","value":10,"stepPerCycle":true,"floor":12},"requireApproval":true,"priority":2,"lastRunAt":1792971241422},{"id":"r-2","name":"Winter coats — refresh","enabled":false,"target":{"statuses":["hidden","draft"],"olderThanDays":60,"cooldownDays":30},"cadence":{"type":"weekly","time":"18:30","daysOfWeek":[0,3]},"window":{"startHour":9,"endHour":21},"limits":{"maxPerRun":8,"maxPerDay":24,"minGapSec":120},"price":{"mode":"none","value":0,"stepPerCycle":false},"requireApproval":true,"priority":0}],"runs":[{"id":"run-1","ruleId":"r-1","ruleName":"Stale stock — every 3 weeks","createdAt":1793036041422,"scheduledAt":1793036041422,"expiresAt":1793208841422,"status":"planned","items":[{"listingId":"48200100","title":"Wool coat, camel — size M","plannedPrice":43.2,"reason":"not relisted in 14 days"},{"listingId":"48200107","title":"Denim jacket, vintage wash","plannedPrice":28.8,"reason":"older than 30 days"},{"listingId":"48200114","title":"Leather ankle boots, EU 39","plannedPrice":35.1,"reason":"older than 30 days"},{"listingId":"48200121","title":"Knit sweater, cream","plannedPrice":16.65,"reason":"older than 30 days"},{"listingId":"48200128","title":"Floral summer dress, size S","plannedPrice":19.8,"reason":"older than 30 days"}]},{"id":"run-0","ruleId":"r-1","ruleName":"Stale stock — every 3 weeks","createdAt":1792964041422,"scheduledAt":1792964041422,"expiresAt":1793136841422,"status":"completed","items":[],"batchId":"b-2401","summary":{"relisted":5,"skipped":1,"failed":0}}]},"ledger":{"entries":[{"id":"l1","kind":"sale","date":1792870441422,"amount":22,"currency":"EUR","listingId":"48200128","source":"detected-sale","confirmed":true,"createdAt":1792870441422},{"id":"l2","kind":"sale","date":1792524841422,"amount":39,"currency":"EUR","source":"manual","confirmed":true,"createdAt":1792524841422},{"id":"l3","kind":"cost","date":1792352041422,"amount":6.5,"currency":"EUR","costType":"shipping","source":"manual","confirmed":true,"createdAt":1792352041422},{"id":"l4","kind":"sale","date":1792006441422,"amount":32,"currency":"EUR","source":"manual","confirmed":true,"createdAt":1792006441422},{"id":"l5","kind":"cost","date":1791747241422,"amount":14,"currency":"EUR","costType":"item","source":"manual","confirmed":true,"createdAt":1791747241422}]},"gate":{"paid":false,"status":"free","tier":"free","allowed":true,"remaining":43,"limit":50},"rate":{"level":"ok","enabled":true,"perHour":3,"perDay":11,"warnPerHour":15,"warnPerDay":60,"blockPerHour":30,"blockPerDay":150},"usage":{"relistsCompleted":7,"firstRelistAt":1790796841422,"lastRelistAt":1793032441422},"license":{"key":"","tier":"free","status":"none"},"traction":{"byListing":{"48200100":{"samples":[{"at":1792791241422,"views":13,"favourites":1},{"at":1792892041422,"views":31,"favourites":4},{"at":1793036041422,"views":51,"favourites":6}]},"48200107":{"samples":[{"at":1792532041422,"views":11,"favourites":1},{"at":1792632841422,"views":26,"favourites":2},{"at":1793036041422,"views":44,"favourites":4}]},"48200114":{"samples":[{"at":1792100041422,"views":10,"favourites":1},{"at":1792200841422,"views":23,"favourites":1},{"at":1793036041422,"views":38,"favourites":3}]}}}};
+  var OPTS = {"full":true};
+  // Static (site) demo: the same bundle is served as a plain file, so the
+  // language, theme and checklist come from the query string the wrapper links
+  // to. This has to run *before* the overrides below, or a URL option would be
+  // silently ignored (it was, once).
+  try {
+    var q = new URLSearchParams(location.search);
+    var LANGS = ['en', 'nl', 'fr', 'de', 'es', 'it'];
+    if (!OPTS.lang && LANGS.indexOf(q.get('lang')) !== -1) OPTS.lang = q.get('lang');
+    if (!OPTS.theme && (q.get('theme') === 'light' || q.get('theme') === 'dark')) OPTS.theme = q.get('theme');
+    if (!OPTS.hint && q.get('hint') === '1') OPTS.hint = true;
+  } catch (e) { /* no URLSearchParams: fall back to the baked values */ }
+  // The site demo picks a language from ?lang=; the store shots never set it.
+  if (OPTS.lang) D.settings = Object.assign({}, D.settings, { language: OPTS.lang });
+  if (OPTS.theme) D.settings = Object.assign({}, D.settings, { theme: OPTS.theme });
+  // hint=1 hides the first-run checklist: on the marketing site it would
+  // read as "2/4 done" for a visitor who has never installed anything.
+  if (OPTS.hint) D.settings = Object.assign({}, D.settings, { onboardingSeen: true });
+  // Mutations are the one thing a demo must not *pretend* to do silently: tell
+  // the surrounding page so it can say "this is sample data" instead of leaving
+  // the visitor wondering whether their real wardrobe just changed.
+  var MUTATING = ['startBatch', 'resumeBatch', 'pauseBatch', 'cancelBatch', 'deleteListing',
+    'saveSettings', 'relistOne', 'approveRun', 'rejectRun', 'importData'];
+  function announce(action) {
+    try {
+      if (window.parent !== window) {
+        window.parent.postMessage({ novalynDemo: action }, '*');
+      }
+    } catch (e) { /* cross-origin parent: the demo still works, just silently */ }
+  }
+  function rsp(action) {
+    switch (action) {
+      case 'getSettings':    return { success: true, settings: D.settings };
+      case 'getListings':    return { success: true, listings: D.listings };
+      case 'getBatches':     return { success: true, batches: D.batches };
+      case 'getHistory':     return { success: true, history: D.history };
+      case 'getArchive':     return { success: true, archive: D.archive };
+      case 'getAutomation':  return { success: true, automation: D.automation };
+      case 'getLedger':      return { success: true, ledger: D.ledger };
+      case 'getEntitlement': return { success: true, gate: D.gate, configured: true };
+      case 'getLicense':     return { success: true, license: D.license, usage: D.usage, gate: D.gate, configured: true, provider: 'offline' };
+      case 'getRateStatus':  return { success: true, status: D.rate, blockedUntil: null };
+      case 'getTraction':    return { success: true, traction: D.traction };
+      case 'engineStatus':   return { success: true, running: false, paused: false, log: [] };
+      case 'openVintedTab':  return { success: true, tabId: 1 };
+      case 'fetchImage':     return { success: false };
+      default:               return { success: true };
+    }
+  }
+  function later(fn, value) { if (typeof fn === 'function') setTimeout(function () { fn(value); }, 0); return Promise.resolve(value); }
+  var noop = function () {};
+  var listeners = { addListener: noop, removeListener: noop, hasListener: function () { return false; } };
+  var VINTED_TAB = { id: 1, index: 0, active: true, url: 'https://www.vinted.be/', title: 'Vinted' };
+  var store = { settings: D.settings };
+
+  window.chrome = {
+    runtime: {
+      id: 'demo',
+      lastError: undefined,
+      sendMessage: function (msg, cb) {
+        var a = msg && msg.action;
+        if (MUTATING.indexOf(a) !== -1) announce(a);
+        return later(cb, rsp(a));
+      },
+      getURL: function (p) { return '/' + String(p || '').replace(/^\/+/, ''); },
+      openOptionsPage: noop,
+      onMessage: listeners,
+      onInstalled: listeners,
+      onStartup: listeners,
+    },
+    storage: {
+      local: {
+        get: function (keys, cb) {
+          var out = {};
+          if (typeof keys === 'string') out[keys] = store[keys];
+          else if (Array.isArray(keys)) keys.forEach(function (k) { out[k] = store[k]; });
+          else if (keys && typeof keys === 'object') Object.keys(keys).forEach(function (k) { out[k] = store[k] !== undefined ? store[k] : keys[k]; });
+          else out = Object.assign({}, store);
+          return later(cb, out);
+        },
+        set: function (obj, cb) { Object.assign(store, obj); later(cb, undefined); return Promise.resolve(); },
+        remove: function (k, cb) { later(cb, undefined); return Promise.resolve(); },
+        clear: function (cb) { store = {}; later(cb, undefined); return Promise.resolve(); },
+      },
+      session: {
+        get: function (k, cb) { return later(cb, {}); },
+        set: function (o, cb) { later(cb, undefined); return Promise.resolve(); },
+        remove: function (k, cb) { later(cb, undefined); return Promise.resolve(); },
+      },
+      sync: { get: function (k, cb) { return later(cb, {}); }, set: function (o, cb) { later(cb, undefined); return Promise.resolve(); } },
+      onChanged: listeners,
+    },
+    tabs: {
+      query: function (q, cb) { return later(cb, [VINTED_TAB]); },
+      get: function (id, cb) { return later(cb, VINTED_TAB); },
+      sendMessage: function (id, msg, cb) {
+        var a = msg && msg.action;
+        var res = a === 'isLoggedIn' ? { success: true, loggedIn: true } : { success: true };
+        return later(cb, res);
+      },
+      create: function (o, cb) { return later(cb, VINTED_TAB); },
+      update: function (id, o, cb) { return later(cb, VINTED_TAB); },
+      onUpdated: listeners,
+      onActivated: listeners,
+    },
+    action: { openPopup: noop, setBadgeText: noop, setBadgeBackgroundColor: noop, setIcon: noop },
+    alarms: { create: noop, clear: noop, onAlarm: listeners },
+    notifications: { create: noop, onClicked: listeners },
+    windows: { create: noop },
+    i18n: { getUILanguage: function () { return 'en'; }, getMessage: function () { return ''; } },
+  };
+
+  // A popup window is at most 600px tall, so a real capture would cut the list
+  // off. ?full=1 lifts that cap (the sub-panels keep their own scroll, exactly
+  // as they do in the product) so the whole popup can be shown.
+  if (OPTS.full) {
+    var fs = document.createElement('style');
+    fs.textContent = 'body{max-height:none !important}' +
+      // ?whole=1 also opens the tab pane, so the site can show a complete list
+      // instead of a scroll-clipped one. The interactive demo never uses it:
+      // there the popup must scroll exactly like the real thing.
+      (OPTS.whole ? '.tab-content{max-height:none !important}' : '');
+    document.head.appendChild(fs);
+  }
+
+  window.addEventListener('load', function () {
+    setTimeout(function () {
+      if (OPTS.tab) {
+        var btn = document.querySelector('.tab-btn[data-tab="' + OPTS.tab + '"]');
+        if (btn) btn.click();
+      }
+      // Let the (async) render settle before scrolling / capturing.
+      setTimeout(function () {
+        if (OPTS.scroll) {
+          var pane = document.querySelector('.tab-content.active') || document.scrollingElement;
+          pane.scrollTop = OPTS.scroll === 'bottom' ? pane.scrollHeight : Number(OPTS.scroll) || 0;
+        }
+        document.documentElement.setAttribute('data-ready', '1');
+      }, 300);
+    }, 250);
+  });
+})();
+</script>
+<script src="popup.js"></script>
+</body>
+</html>

@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /demo/harness/
 
 Sitemap: https://novalyn-app.github.io/sitemap.xml

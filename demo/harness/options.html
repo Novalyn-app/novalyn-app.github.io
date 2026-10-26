@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="robots" content="noindex">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novalyn — Records</title>
+    <link rel="stylesheet" href="options.css">
+</head>
+<body>
+    <div class="page">
+        <header class="page-head">
+            <div class="brand">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 32 32" width="34" height="34" role="img">
+                        <defs>
+                            <linearGradient id="nvGrad" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0" stop-color="#4F46E5"/>
+                                <stop offset="1" stop-color="#7C3AED"/>
+                            </linearGradient>
+                        </defs>
+                        <rect x="0" y="0" width="32" height="32" rx="7" fill="url(#nvGrad)"/>
+                        <path d="M10.9 9 L10.9 23 M10.9 9 L21.1 23 M21.1 9 L21.1 23"
+                              stroke="#ffffff" stroke-width="2.7" stroke-linecap="round" fill="none"/>
+                        <path d="M25 4.3 L25.7 6.3 L27.7 7 L25.7 7.7 L25 9.7 L24.3 7.7 L22.3 7 L24.3 6.3 Z"
+                              fill="#FDE68A"/>
+                    </svg>
+                </span>
+                <span class="brand-text">
+                    <strong>Novalyn</strong>
+                    <span class="brand-sub" data-i18n="records.title">Records</span>
+                </span>
+            </div>
+            <div class="head-actions">
+                <label class="field-inline">
+                    <span data-i18n="records.currency">Currency</span>
+                    <select id="currencySelect"></select>
+                </label>
+                <button id="btnClose" class="btn btn-secondary btn-tiny" data-i18n="btn.close">Close</button>
+            </div>
+        </header>
+
+        <section class="card license-card" id="license">
+            <div class="card-head"><h2 data-i18n="license.title">Licence</h2></div>
+            <div class="license-summary">
+                <span id="licensePlan" class="license-plan">—</span>
+                <span id="licenseRemaining" class="license-remaining"></span>
+                <span id="licenseExpiry" class="license-expiry"></span>
+            </div>
+            <p class="hint license-renew" id="licenseRenew" style="display: none;"></p>
+            <div class="license-activate">
+                <label class="field grow">
+                    <span data-i18n="license.key">Licence key</span>
+                    <input type="text" id="licenseKey" autocomplete="off" spellcheck="false"
+                           data-i18n-placeholder="license.keyPlaceholder" placeholder="Paste your licence key">
+                </label>
+                <div class="license-actions">
+                    <button id="btnActivateLicense" class="btn btn-primary" data-i18n="license.activate">Activate</button>
+                    <button id="btnDeactivateLicense" class="btn btn-secondary" style="display: none;" data-i18n="license.deactivate">Deactivate this device</button>
+                </div>
+            </div>
+            <p class="hint" data-i18n="license.hint">
+                A licence unlocks unlimited relists. Keep it somewhere safe: you will need to paste
+                it again after reinstalling the extension or moving to another computer.
+            </p>
+            <div class="license-howto" id="licenseHowTo">
+                <span class="license-howto-title" data-i18n="license.howTo.title">How to activate</span>
+                <ol>
+                    <li data-i18n="license.howTo.step1">
+                        Choose a plan below and pay in the Stripe tab that opens. Your licence key is
+                        emailed automatically to the address you fill in at checkout — usually within
+                        a minute or two. If it has not arrived, check your spam folder: it often ends
+                        up there.
+                    </li>
+                    <li data-i18n="license.howTo.step2">
+                        Paste the key into the field above — it starts with NV1. or NV2. — and click
+                        Activate.
+                    </li>
+                    <li data-i18n="license.howTo.step3">
+                        That is it: relisting is unlimited from then on. The key works on every computer
+                        you use; a monthly or yearly key runs to its renewal date — and at each renewal we
+                        email you a fresh key to paste in here.
+                    </li>
+                </ol>
+            </div>
+            <!-- Deliberately OUTSIDE #licenseHowTo: options.ts hides that block once a
+                 key is active, and this is the condition of the Lifetime sale — the
+                 person who owns one is exactly who must keep seeing it. -->
+            <p class="license-lifetime-note" data-i18n="license.lifetimeNote">
+                A Lifetime licence is a one-time payment: the key never expires and there are no
+                renewals. It gives you unlimited relists for as long as Novalyn is offered and keeps
+                working with Vinted. We cannot promise that forever, because Vinted can change its
+                site or its rules in ways no relisting tool can follow.
+            </p>
+            <div class="license-upgrade">
+                <span class="license-upgrade-title" data-i18n="license.upgradeTitle">Unlock unlimited relists</span>
+                <div class="license-upgrade-actions">
+                    <button class="btn btn-primary btn-tiny" data-plan="monthly" data-i18n="license.upgrade.monthly">Monthly</button>
+                    <button class="btn btn-primary btn-tiny" data-plan="yearly" data-i18n="license.upgrade.yearly">Yearly</button>
+                    <button class="btn btn-primary btn-tiny" data-plan="lifetime" data-i18n="license.upgrade.lifetime">Lifetime — best value</button>
+                </div>
+            </div>
+            <p class="license-site">
+                <a href="#" id="linkSite" data-i18n="site.open">Website</a>
+                <span class="license-site-hint" data-i18n="site.hint">Help, pricing and privacy</span>
+            </p>
+        </section>
+
+        <p class="disclaimer" data-i18n="records.notTaxGrade">
+            These are your own notes, only as complete as what you enter — handy for a running view
+            of profit, not a tax document.
+        </p>
+        <p id="currencyNotice" class="notice" style="display: none;"></p>
+
+        <div class="toolbar">
+            <div class="period-toggle" id="periodToggle" role="group" data-i18n-aria-label="records.period">
+                <button class="period-btn" data-period="day" data-i18n="records.period.day">Day</button>
+                <button class="period-btn" data-period="week" data-i18n="records.period.week">Week</button>
+                <button class="period-btn active" data-period="month" data-i18n="records.period.month">Month</button>
+                <button class="period-btn" data-period="year" data-i18n="records.period.year">Year</button>
+                <button class="period-btn" data-period="all" data-i18n="records.period.all">All</button>
+            </div>
+            <div class="period-nav">
+                <button id="btnPrev" class="btn btn-secondary btn-tiny" data-i18n-title="records.prev" title="Previous period">&lsaquo;</button>
+                <span id="periodLabel" class="period-label"></span>
+                <button id="btnNext" class="btn btn-secondary btn-tiny" data-i18n-title="records.next" title="Next period">&rsaquo;</button>
+            </div>
+        </div>
+
+        <section class="tiles">
+            <div class="tile">
+                <span class="tile-label" data-i18n="records.sales">Sales</span>
+                <span class="tile-value" id="tileSales">—</span>
+                <span class="tile-sub" id="tileSalesSub"></span>
+            </div>
+            <div class="tile">
+                <span class="tile-label" data-i18n="records.costs">Costs</span>
+                <span class="tile-value" id="tileCosts">—</span>
+                <span class="tile-sub" id="tileCostsSub"></span>
+            </div>
+            <div class="tile tile-strong">
+                <span class="tile-label" data-i18n="records.net">Net</span>
+                <span class="tile-value" id="tileNet">—</span>
+            </div>
+            <div class="tile">
+                <span class="tile-label" data-i18n="records.avgSale">Average sale</span>
+                <span class="tile-value" id="tileAvg">—</span>
+            </div>
+            <div class="tile" id="tileMarginWrap" hidden>
+                <span class="tile-label" data-i18n="records.avgMargin">Average margin</span>
+                <span class="tile-value" id="tileMargin">—</span>
+                <span class="tile-sub" id="tileMarginSub"></span>
+            </div>
+        </section>
+
+        <section class="card" id="timingCard" hidden>
+            <div class="card-head"><h2 data-i18n="records.timing.title">Time to sell</h2></div>
+            <div id="timingBody" class="timing-body"></div>
+            <p class="hint" data-i18n="records.timing.note">Counted from the ad's creation date (or its last relist) to the sale date you booked.</p>
+        </section>
+
+        <section class="card">
+            <div class="card-head"><h2 data-i18n="records.chart.title">Net over time</h2></div>
+            <div id="chart" class="chart"></div>
+        </section>
+
+        <section class="card" id="activityCard" style="display: none;">
+            <div class="card-head">
+                <h2 data-i18n="records.activity.title">Vinted activity</h2>
+                <span id="activityCount" class="activity-count"></span>
+            </div>
+            <p class="hint" data-i18n="records.activity.hint">
+                Found on Vinted and waiting for your confirmation. Nothing reaches your figures until
+                you confirm it.
+            </p>
+            <div id="activityList" class="queue activity-list"></div>
+            <div class="activity-actions">
+                <label class="check">
+                    <input type="checkbox" id="activitySelectAll" checked>
+                    <span data-i18n="records.activity.selectAll">Select all</span>
+                </label>
+                <button id="btnBookActivity" class="btn btn-primary btn-tiny" data-i18n="records.activity.confirm">Confirm selection</button>
+            </div>
+        </section>
+
+        <section class="grid-2">
+            <div class="card">
+                <div class="card-head"><h2 data-i18n="records.entries">Entries</h2></div>
+                <div class="entries-toolbar">
+                    <input type="search" id="entriesSearch" class="entries-search" data-i18n-placeholder="records.search.placeholder" placeholder="Search title, note or amount…">
+                    <div class="period-toggle entries-view" id="entriesView" role="group">
+                        <button class="period-btn active" data-view="list" data-i18n="records.view.list">List</button>
+                        <button class="period-btn" data-view="month" data-i18n="records.view.month">Monthly</button>
+                        <button class="period-btn" data-view="year" data-i18n="records.view.year">Yearly</button>
+                        <button class="period-btn" data-view="listing" data-i18n="records.view.listing">Per listing</button>
+                    </div>
+                    <button id="btnExportCsv" class="btn btn-secondary btn-tiny" data-i18n="records.export">Export CSV</button>
+                    <button id="btnImportCsv" class="btn btn-secondary btn-tiny" data-i18n="records.importCsv">Import CSV</button>
+                    <input type="file" id="importCsvFile" accept=".csv,text/csv" hidden>
+                </div>
+                <div class="period-toggle entry-filters" id="entryFilters" role="group">
+                    <button class="period-btn active" data-filter="all" data-i18n="records.filter.all">All</button>
+                    <button class="period-btn" data-filter="sale" data-i18n="records.filter.sales">Sales</button>
+                    <button class="period-btn" data-filter="cost" data-i18n="records.filter.costs">Costs</button>
+                    <button class="period-btn" data-filter="manual" data-i18n="records.filter.manual">Manual</button>
+                    <button class="period-btn" data-filter="auto" data-i18n="records.filter.auto">Automatic</button>
+                </div>
+                <div id="autoSalesStrip" class="auto-strip" style="display: none;"></div>
+                <div class="table-wrap">
+                    <table class="ledger-table">
+                        <thead>
+                            <tr>
+                                <th data-i18n="records.table.date">Date</th>
+                                <th data-i18n="records.table.description">Description</th>
+                                <th class="num" data-i18n="records.table.amount">Amount</th>
+                                <th data-i18n="records.table.actions">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="entriesBody"></tbody>
+                    </table>
+                </div>
+                <div id="entriesEmpty" class="empty" style="display: none;" data-i18n="records.table.empty">No entries in this period.</div>
+            </div>
+            <div class="card">
+                <div class="card-head"><h2 data-i18n="records.breakdown.title">Costs by type</h2></div>
+                <div id="breakdown" class="breakdown"></div>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="card-head"><h2 data-i18n="records.addEntry">Add entry</h2></div>
+            <form id="entryForm" class="entry-form">
+                <label class="field">
+                    <span data-i18n="records.field.kind">Kind</span>
+                    <select id="entryKind">
+                        <option value="sale" data-i18n="records.kind.sale">Sale</option>
+                        <option value="cost" data-i18n="records.kind.cost">Cost</option>
+                    </select>
+                </label>
+                <label class="field">
+                    <span data-i18n="records.field.date">Date</span>
+                    <input type="date" id="entryDate">
+                </label>
+                <label class="field">
+                    <span data-i18n="records.field.amount">Amount</span>
+                    <input type="number" id="entryAmount" min="0" step="0.01" inputmode="decimal">
+                </label>
+                <label class="field" id="entryCostTypeWrap">
+                    <span data-i18n="records.costType">Type</span>
+                    <select id="entryCostType">
+                        <option value="item" data-i18n="records.cost.item">Item cost</option>
+                        <option value="shipping" data-i18n="records.cost.shipping">Shipping</option>
+                        <option value="promotion" data-i18n="records.cost.promotion">Promotion</option>
+                        <option value="withdrawal" data-i18n="records.cost.withdrawal">Withdrawal fee</option>
+                        <option value="protection" data-i18n="records.cost.protection">Buyer protection</option>
+                        <option value="other" data-i18n="records.cost.other">Other</option>
+                    </select>
+                </label>
+                <label class="field grow">
+                    <span data-i18n="records.field.listing">Listing (optional)</span>
+                    <select id="entryListing">
+                        <option value="" data-i18n="records.none">None</option>
+                    </select>
+                </label>
+                <label class="field grow">
+                    <span data-i18n="records.field.note">Note (optional)</span>
+                    <input type="text" id="entryNote" maxlength="120">
+                </label>
+                <label class="field grow" id="entryCostBasisField" style="display: none;">
+                    <span data-i18n="records.field.costBasis">Purchase price (optional)</span>
+                    <input type="number" id="entryCostBasis" min="0" step="0.01" placeholder="0" data-i18n-title="records.field.costBasisHint" title="What you paid for the item — used for the margin only">
+                </label>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary" id="btnSaveEntry" data-i18n="records.save">Save entry</button>
+                    <button type="button" class="btn btn-secondary" id="btnResetEntry" style="display: none;" data-i18n="records.cancel">Cancel</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="card">
+            <div class="card-head"><h2 data-i18n="records.auto.title">Automatic recording</h2></div>
+            <label class="check">
+                <input type="checkbox" id="autoRecordSales">
+                <span data-i18n="records.auto.sales">Record sales automatically when an item sells</span>
+            </label>
+            <label class="check">
+                <input type="checkbox" id="autoRecordPurchases">
+                <span data-i18n="records.auto.purchases">Scan purchases automatically from Vinted</span>
+            </label>
+            <label class="check">
+                <input type="checkbox" id="collapseAutoEntries">
+                <span data-i18n="records.auto.collapse">Collapse automatically recorded sales in the list</span>
+            </label>
+            <p class="hint" data-i18n="records.auto.hint">
+                Off by default. When on, Novalyn reads your sold items and purchase history the next
+                time this page opens and puts them in the Vinted activity queue above — nothing is
+                booked until you confirm it.
+            </p>
+        </section>
+
+        <footer class="foot">
+            <button id="btnClearAutoEntries" class="btn btn-secondary btn-tiny" style="display: none;"></button>
+            <button id="btnClearLedger" class="btn btn-danger btn-tiny" data-i18n="records.clear">Clear all records</button>
+        </footer>
+    </div>
+
+    <script>
+(function () {
+  var D = {"settings":{"autoRetry":true,"stopOnFirstFailure":false,"maxRetries":3,"retryDelay":5,"delayBetween":12,"delayUnit":"seconds","rateLimitEnabled":true,"rateWarnPerHour":15,"rateWarnPerDay":60,"rateBlockPerHour":30,"rateBlockPerDay":150,"showLauncher":false,"photoVariance":true,"language":"en","theme":"dark"},"listings":{"48200100":{"id":"48200100","title":"Wool coat, camel — size M","description":"","price":48,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRTlFNEY5Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRDZDREYzIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNNzQsNTAgTDEwMCw0MiBMMTI2LDUwIEwxNDYsNjQgTDE0NiwxNjIgUTEwMCwxNzAgNTQsMTYyIEw1NCw2NCBaIiBmaWxsPSIjNkQ1QkQwIiBvcGFjaXR5PSIwLjkiLz48cGF0aCBkPSJNOTIsNDggTDEwMCw3MiBMMTA4LDQ4IFoiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuNTUiLz48L3N2Zz4="],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"active","createdAt":1792870441422,"currency":"EUR"},"48200107":{"id":"48200107","title":"Denim jacket, vintage wash","description":"","price":32,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRENFOEY4Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjQzJENkYxIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNNzQsNTQgTDEwMCw0NiBMMTI2LDU0IEwxNDIsNjYgTDE0MiwxNDIgUTEwMCwxNTAgNTgsMTQyIEw1OCw2NiBaIiBmaWxsPSIjNEE2RkE1IiBvcGFjaXR5PSIwLjkiLz48cGF0aCBkPSJNOTAsNTAgTDEwMCw3MCBMMTEwLDUwIFoiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuNTUiLz48L3N2Zz4="],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"active","createdAt":1792611241422,"currency":"EUR"},"48200114":{"id":"48200114","title":"Leather ankle boots, EU 39","description":"","price":39,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRjJFNkRCIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRTJEMEJFIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNNzgsNDYgTDEwOCw0NiBMMTA4LDEwNCBRMTE2LDExMiAxMzgsMTE4IFExNDgsMTI0IDE0NCwxMzggTDc0LDEzOCBRNjgsMTI4IDc0LDExNiBaIiBmaWxsPSIjOEE2QTRGIiBvcGFjaXR5PSIwLjkiLz48cGF0aCBkPSJNNzQsMTMwIEwxNDQsMTMwIEwxNDQsMTM4IEw3NCwxMzggWiIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC41NSIvPjwvc3ZnPg=="],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"active","createdAt":1792265641422,"currency":"EUR"},"48200121":{"id":"48200121","title":"Knit sweater, cream","description":"","price":18.5,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRjhFRkUxIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRUZERkM5Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNNzgsNTAgTDEwMCw0NCBMMTIyLDUwIEwxNDYsNjIgTDE1MiwxMTAgTDEzNCwxMTQgTDEyOCw4OCBMMTI4LDE0OCBRMTAwLDE1NCA3MiwxNDggTDcyLDg4IEw2NiwxMTQgTDQ4LDExMCBMNTQsNjIgWiIgZmlsbD0iI0E5ODM0RiIgb3BhY2l0eT0iMC45Ii8+PC9zdmc+"],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"active","createdAt":1791833641422,"currency":"EUR"},"48200128":{"id":"48200128","title":"Floral summer dress, size S","description":"","price":22,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRkFFMUU5Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRjFDOUQ3Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNODYsNDggTDEwMCw0NCBMMTE0LDQ4IEwxMTEsNzQgTDEzNywxNTIgUTEwMCwxNjIgNjMsMTUyIEw4OSw3NCBaIiBmaWxsPSIjQjA1QTc5IiBvcGFjaXR5PSIwLjkiLz48cGF0aCBkPSJNODYsNzQgTDExNCw3NCBMMTEyLDg0IEw4OCw4NCBaIiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjU1Ii8+PC9zdmc+"],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"sold","createdAt":1791228841422,"currency":"EUR"},"48200135":{"id":"48200135","title":"Silk scarf, navy","description":"","price":14,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjREVFRUYxIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjQzRFMEU1Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNNTgsNTQgUTEwMCw3MiAxNDIsNTQgTDE0Miw3NiBRMTAwLDk0IDU4LDc2IFoiIGZpbGw9IiMzRjdGOEEiIG9wYWNpdHk9IjAuOSIvPjxwYXRoIGQ9Ik04NCw4MCBMOTIsODAgTDg4LDE0OCBMODAsMTQ4IFogTTExMiw4MCBMMTIwLDgwIEwxMTYsMTQ4IEwxMDgsMTQ4IFoiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuNTUiLz48L3N2Zz4="],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"hidden","createdAt":1790451241422,"currency":"EUR"},"48200142":{"id":"48200142","title":"Canvas sneakers, EU 42","description":"","price":25,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRTdFQUYwIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRDJEOEUxIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNNTgsMTAwIFE2NCw4MiA4NCw4MiBMOTIsOTQgUTEwOCw4NCAxMjQsOTYgUTE0NCwxMTAgMTQ0LDEyNCBMNTgsMTI0IFoiIGZpbGw9IiM1QTY0NzIiIG9wYWNpdHk9IjAuOSIvPjxwYXRoIGQ9Ik01OCwxMTggTDE0NCwxMTggTDE0NCwxMjQgTDU4LDEyNCBaIiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjU1Ii8+PC9zdmc+"],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"draft","createdAt":1789587241422,"currency":"EUR"},"48200149":{"id":"48200149","title":"Linen shirt, white","description":"","price":20,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRjBGMEY1Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjREZERkU5Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNNzYsNTAgTDEwMCw0NCBMMTI0LDUwIEwxNDIsNjIgTDE0OCwxMDQgTDEzMiwxMDggTDEyOCw4NCBMMTI4LDE0OCBRMTAwLDE1NCA3MiwxNDggTDcyLDg0IEw2OCwxMDggTDUyLDEwNCBMNTgsNjIgWiIgZmlsbD0iIzZCNkI3QiIgb3BhY2l0eT0iMC45Ii8+PHBhdGggZD0iTTkyLDQ4IEwxMDAsNjYgTDEwOCw0OCBaIE0xMDAsODAgTDEwMCwxNDAgTDk2LDE0MCBMOTYsODAgWiIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC41NSIvPjwvc3ZnPg=="],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"active","createdAt":1788291241422,"currency":"EUR"}},"batches":{"b-2401":{"id":"b-2401","status":"running","progress":5,"total":6,"delayBetween":12,"startedAt":1793040721422,"nextRelistAt":1793043248422,"jobs":[{"listingId":"48200100","retryCount":0,"status":"completed"},{"listingId":"48200107","retryCount":0,"status":"completed"},{"listingId":"48200114","retryCount":0,"status":"completed"},{"listingId":"48200121","retryCount":0,"status":"completed"},{"listingId":"48200128","retryCount":0,"status":"completed"},{"listingId":"48200135","retryCount":0,"status":"running"}]}},"history":[{"id":"h-0","listingId":"48200100","originalListing":{"id":"48200100","title":"Wool coat, camel — size M","description":"","price":48,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRTlFNEY5Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRDZDREYzIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNNzQsNTAgTDEwMCw0MiBMMTI2LDUwIEwxNDYsNjQgTDE0NiwxNjIgUTEwMCwxNzAgNTQsMTYyIEw1NCw2NCBaIiBmaWxsPSIjNkQ1QkQwIiBvcGFjaXR5PSIwLjkiLz48cGF0aCBkPSJNOTIsNDggTDEwMCw3MiBMMTA4LDQ4IFoiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuNTUiLz48L3N2Zz4="],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"active","createdAt":1792870441422,"currency":"EUR"},"newListingId":"99000000","timestamp":1793043241422,"success":true},{"id":"h-1","listingId":"48200107","originalListing":{"id":"48200107","title":"Denim jacket, vintage wash","description":"","price":32,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRENFOEY4Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjQzJENkYxIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNNzQsNTQgTDEwMCw0NiBMMTI2LDU0IEwxNDIsNjYgTDE0MiwxNDIgUTEwMCwxNTAgNTgsMTQyIEw1OCw2NiBaIiBmaWxsPSIjNEE2RkE1IiBvcGFjaXR5PSIwLjkiLz48cGF0aCBkPSJNOTAsNTAgTDEwMCw3MCBMMTEwLDUwIFoiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuNTUiLz48L3N2Zz4="],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"active","createdAt":1792611241422,"currency":"EUR"},"newListingId":"99000001","timestamp":1793032441422,"success":true},{"id":"h-2","listingId":"48200114","originalListing":{"id":"48200114","title":"Leather ankle boots, EU 39","description":"","price":39,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRjJFNkRCIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRTJEMEJFIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNNzgsNDYgTDEwOCw0NiBMMTA4LDEwNCBRMTE2LDExMiAxMzgsMTE4IFExNDgsMTI0IDE0NCwxMzggTDc0LDEzOCBRNjgsMTI4IDc0LDExNiBaIiBmaWxsPSIjOEE2QTRGIiBvcGFjaXR5PSIwLjkiLz48cGF0aCBkPSJNNzQsMTMwIEwxNDQsMTMwIEwxNDQsMTM4IEw3NCwxMzggWiIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC41NSIvPjwvc3ZnPg=="],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"active","createdAt":1792265641422,"currency":"EUR"},"newListingId":"99000002","timestamp":1793021641422,"success":true},{"id":"h-3","listingId":"48200121","originalListing":{"id":"48200121","title":"Knit sweater, cream","description":"","price":18.5,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRjhFRkUxIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRUZERkM5Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNNzgsNTAgTDEwMCw0NCBMMTIyLDUwIEwxNDYsNjIgTDE1MiwxMTAgTDEzNCwxMTQgTDEyOCw4OCBMMTI4LDE0OCBRMTAwLDE1NCA3MiwxNDggTDcyLDg4IEw2NiwxMTQgTDQ4LDExMCBMNTQsNjIgWiIgZmlsbD0iI0E5ODM0RiIgb3BhY2l0eT0iMC45Ii8+PC9zdmc+"],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"active","createdAt":1791833641422,"currency":"EUR"},"newListingId":"99000003","timestamp":1793010841422,"success":true},{"id":"h-4","listingId":"48200128","originalListing":{"id":"48200128","title":"Floral summer dress, size S","description":"","price":22,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRkFFMUU5Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRjFDOUQ3Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNODYsNDggTDEwMCw0NCBMMTE0LDQ4IEwxMTEsNzQgTDEzNywxNTIgUTEwMCwxNjIgNjMsMTUyIEw4OSw3NCBaIiBmaWxsPSIjQjA1QTc5IiBvcGFjaXR5PSIwLjkiLz48cGF0aCBkPSJNODYsNzQgTDExNCw3NCBMMTEyLDg0IEw4OCw4NCBaIiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjU1Ii8+PC9zdmc+"],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"sold","createdAt":1791228841422,"currency":"EUR"},"newListingId":"99000004","timestamp":1793000041422,"success":true},{"id":"h-5","listingId":"48200135","originalListing":{"id":"48200135","title":"Silk scarf, navy","description":"","price":14,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjREVFRUYxIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjQzRFMEU1Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNNTgsNTQgUTEwMCw3MiAxNDIsNTQgTDE0Miw3NiBRMTAwLDk0IDU4LDc2IFoiIGZpbGw9IiMzRjdGOEEiIG9wYWNpdHk9IjAuOSIvPjxwYXRoIGQ9Ik04NCw4MCBMOTIsODAgTDg4LDE0OCBMODAsMTQ4IFogTTExMiw4MCBMMTIwLDgwIEwxMTYsMTQ4IEwxMDgsMTQ4IFoiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuNTUiLz48L3N2Zz4="],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"hidden","createdAt":1790451241422,"currency":"EUR"},"newListingId":"99000005","timestamp":1792989241422,"success":true}],"archive":[{"id":"a-0","listingId":"48200100","listing":{"id":"48200100","title":"Wool coat, camel — size M","description":"","price":48,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRTlFNEY5Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRDZDREYzIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNNzQsNTAgTDEwMCw0MiBMMTI2LDUwIEwxNDYsNjQgTDE0NiwxNjIgUTEwMCwxNzAgNTQsMTYyIEw1NCw2NCBaIiBmaWxsPSIjNkQ1QkQwIiBvcGFjaXR5PSIwLjkiLz48cGF0aCBkPSJNOTIsNDggTDEwMCw3MiBMMTA4LDQ4IFoiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuNTUiLz48L3N2Zz4="],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"active","createdAt":1792870441422,"currency":"EUR"},"archivedAt":1793043241422,"reason":"before-relist"},{"id":"a-1","listingId":"48200107","listing":{"id":"48200107","title":"Denim jacket, vintage wash","description":"","price":32,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRENFOEY4Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjQzJENkYxIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNNzQsNTQgTDEwMCw0NiBMMTI2LDU0IEwxNDIsNjYgTDE0MiwxNDIgUTEwMCwxNTAgNTgsMTQyIEw1OCw2NiBaIiBmaWxsPSIjNEE2RkE1IiBvcGFjaXR5PSIwLjkiLz48cGF0aCBkPSJNOTAsNTAgTDEwMCw3MCBMMTEwLDUwIFoiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuNTUiLz48L3N2Zz4="],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"active","createdAt":1792611241422,"currency":"EUR"},"archivedAt":1793021641422,"reason":"before-relist"},{"id":"a-2","listingId":"48200114","listing":{"id":"48200114","title":"Leather ankle boots, EU 39","description":"","price":39,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRjJFNkRCIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRTJEMEJFIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNNzgsNDYgTDEwOCw0NiBMMTA4LDEwNCBRMTE2LDExMiAxMzgsMTE4IFExNDgsMTI0IDE0NCwxMzggTDc0LDEzOCBRNjgsMTI4IDc0LDExNiBaIiBmaWxsPSIjOEE2QTRGIiBvcGFjaXR5PSIwLjkiLz48cGF0aCBkPSJNNzQsMTMwIEwxNDQsMTMwIEwxNDQsMTM4IEw3NCwxMzggWiIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC41NSIvPjwvc3ZnPg=="],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"active","createdAt":1792265641422,"currency":"EUR"},"archivedAt":1793000041422,"reason":"before-relist"},{"id":"a-3","listingId":"48200121","listing":{"id":"48200121","title":"Knit sweater, cream","description":"","price":18.5,"images":["data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRjhFRkUxIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRUZERkM5Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9InVybCgjZykiLz48cGF0aCBkPSJNNzgsNTAgTDEwMCw0NCBMMTIyLDUwIEwxNDYsNjIgTDE1MiwxMTAgTDEzNCwxMTQgTDEyOCw4OCBMMTI4LDE0OCBRMTAwLDE1NCA3MiwxNDggTDcyLDg4IEw2NiwxMTQgTDQ4LDExMCBMNTQsNjIgWiIgZmlsbD0iI0E5ODM0RiIgb3BhY2l0eT0iMC45Ii8+PC9zdmc+"],"category":"Women > Clothing","brand":"—","size":"M","condition":"Very good","status":"active","createdAt":1791833641422,"currency":"EUR"},"archivedAt":1792978441422,"reason":"before-relist"}],"automation":{"enabled":true,"lineage":{"48200100":{"lastRelistedAt":1792784041422,"cycles":1,"rootId":"49000000","preViews":34,"preViewsAt":1789241641422},"48200107":{"lastRelistedAt":1792524841422,"cycles":2,"rootId":"49000001","preViews":19,"preViewsAt":1789241641422},"48200114":{"lastRelistedAt":1792092841422,"cycles":3,"rootId":"49000002","preViews":61,"preViewsAt":1787600041422}},"rules":[{"id":"r-1","name":"Stale stock — every 3 weeks","enabled":true,"target":{"statuses":["active"],"olderThanDays":30,"cooldownDays":14},"cadence":{"type":"daily","time":"10:00"},"window":{"startHour":9,"endHour":21},"limits":{"maxPerRun":5,"maxPerDay":20,"minGapSec":90},"price":{"mode":"percent","value":10,"stepPerCycle":true,"floor":12},"requireApproval":true,"priority":2,"lastRunAt":1792971241422},{"id":"r-2","name":"Winter coats — refresh","enabled":false,"target":{"statuses":["hidden","draft"],"olderThanDays":60,"cooldownDays":30},"cadence":{"type":"weekly","time":"18:30","daysOfWeek":[0,3]},"window":{"startHour":9,"endHour":21},"limits":{"maxPerRun":8,"maxPerDay":24,"minGapSec":120},"price":{"mode":"none","value":0,"stepPerCycle":false},"requireApproval":true,"priority":0}],"runs":[{"id":"run-1","ruleId":"r-1","ruleName":"Stale stock — every 3 weeks","createdAt":1793036041422,"scheduledAt":1793036041422,"expiresAt":1793208841422,"status":"planned","items":[{"listingId":"48200100","title":"Wool coat, camel — size M","plannedPrice":43.2,"reason":"not relisted in 14 days"},{"listingId":"48200107","title":"Denim jacket, vintage wash","plannedPrice":28.8,"reason":"older than 30 days"},{"listingId":"48200114","title":"Leather ankle boots, EU 39","plannedPrice":35.1,"reason":"older than 30 days"},{"listingId":"48200121","title":"Knit sweater, cream","plannedPrice":16.65,"reason":"older than 30 days"},{"listingId":"48200128","title":"Floral summer dress, size S","plannedPrice":19.8,"reason":"older than 30 days"}]},{"id":"run-0","ruleId":"r-1","ruleName":"Stale stock — every 3 weeks","createdAt":1792964041422,"scheduledAt":1792964041422,"expiresAt":1793136841422,"status":"completed","items":[],"batchId":"b-2401","summary":{"relisted":5,"skipped":1,"failed":0}}]},"ledger":{"entries":[{"id":"l1","kind":"sale","date":1792870441422,"amount":22,"currency":"EUR","listingId":"48200128","source":"detected-sale","confirmed":true,"createdAt":1792870441422},{"id":"l2","kind":"sale","date":1792524841422,"amount":39,"currency":"EUR","source":"manual","confirmed":true,"createdAt":1792524841422},{"id":"l3","kind":"cost","date":1792352041422,"amount":6.5,"currency":"EUR","costType":"shipping","source":"manual","confirmed":true,"createdAt":1792352041422},{"id":"l4","kind":"sale","date":1792006441422,"amount":32,"currency":"EUR","source":"manual","confirmed":true,"createdAt":1792006441422},{"id":"l5","kind":"cost","date":1791747241422,"amount":14,"currency":"EUR","costType":"item","source":"manual","confirmed":true,"createdAt":1791747241422}]},"gate":{"paid":false,"status":"free","tier":"free","allowed":true,"remaining":43,"limit":50},"rate":{"level":"ok","enabled":true,"perHour":3,"perDay":11,"warnPerHour":15,"warnPerDay":60,"blockPerHour":30,"blockPerDay":150},"usage":{"relistsCompleted":7,"firstRelistAt":1790796841422,"lastRelistAt":1793032441422},"license":{"key":"","tier":"free","status":"none"},"traction":{"byListing":{"48200100":{"samples":[{"at":1792791241422,"views":13,"favourites":1},{"at":1792892041422,"views":31,"favourites":4},{"at":1793036041422,"views":51,"favourites":6}]},"48200107":{"samples":[{"at":1792532041422,"views":11,"favourites":1},{"at":1792632841422,"views":26,"favourites":2},{"at":1793036041422,"views":44,"favourites":4}]},"48200114":{"samples":[{"at":1792100041422,"views":10,"favourites":1},{"at":1792200841422,"views":23,"favourites":1},{"at":1793036041422,"views":38,"favourites":3}]}}}};
+  var OPTS = {"full":true};
+  // Static (site) demo: the same bundle is served as a plain file, so the
+  // language, theme and checklist come from the query string the wrapper links
+  // to. This has to run *before* the overrides below, or a URL option would be
+  // silently ignored (it was, once).
+  try {
+    var q = new URLSearchParams(location.search);
+    var LANGS = ['en', 'nl', 'fr', 'de', 'es', 'it'];
+    if (!OPTS.lang && LANGS.indexOf(q.get('lang')) !== -1) OPTS.lang = q.get('lang');
+    if (!OPTS.theme && (q.get('theme') === 'light' || q.get('theme') === 'dark')) OPTS.theme = q.get('theme');
+    if (!OPTS.hint && q.get('hint') === '1') OPTS.hint = true;
+  } catch (e) { /* no URLSearchParams: fall back to the baked values */ }
+  // The site demo picks a language from ?lang=; the store shots never set it.
+  if (OPTS.lang) D.settings = Object.assign({}, D.settings, { language: OPTS.lang });
+  if (OPTS.theme) D.settings = Object.assign({}, D.settings, { theme: OPTS.theme });
+  // hint=1 hides the first-run checklist: on the marketing site it would
+  // read as "2/4 done" for a visitor who has never installed anything.
+  if (OPTS.hint) D.settings = Object.assign({}, D.settings, { onboardingSeen: true });
+  // Mutations are the one thing a demo must not *pretend* to do silently: tell
+  // the surrounding page so it can say "this is sample data" instead of leaving
+  // the visitor wondering whether their real wardrobe just changed.
+  var MUTATING = ['startBatch', 'resumeBatch', 'pauseBatch', 'cancelBatch', 'deleteListing',
+    'saveSettings', 'relistOne', 'approveRun', 'rejectRun', 'importData'];
+  function announce(action) {
+    try {
+      if (window.parent !== window) {
+        window.parent.postMessage({ novalynDemo: action }, '*');
+      }
+    } catch (e) { /* cross-origin parent: the demo still works, just silently */ }
+  }
+  function rsp(action) {
+    switch (action) {
+      case 'getSettings':    return { success: true, settings: D.settings };
+      case 'getListings':    return { success: true, listings: D.listings };
+      case 'getBatches':     return { success: true, batches: D.batches };
+      case 'getHistory':     return { success: true, history: D.history };
+      case 'getArchive':     return { success: true, archive: D.archive };
+      case 'getAutomation':  return { success: true, automation: D.automation };
+      case 'getLedger':      return { success: true, ledger: D.ledger };
+      case 'getEntitlement': return { success: true, gate: D.gate, configured: true };
+      case 'getLicense':     return { success: true, license: D.license, usage: D.usage, gate: D.gate, configured: true, provider: 'offline' };
+      case 'getRateStatus':  return { success: true, status: D.rate, blockedUntil: null };
+      case 'getTraction':    return { success: true, traction: D.traction };
+      case 'engineStatus':   return { success: true, running: false, paused: false, log: [] };
+      case 'openVintedTab':  return { success: true, tabId: 1 };
+      case 'fetchImage':     return { success: false };
+      default:               return { success: true };
+    }
+  }
+  function later(fn, value) { if (typeof fn === 'function') setTimeout(function () { fn(value); }, 0); return Promise.resolve(value); }
+  var noop = function () {};
+  var listeners = { addListener: noop, removeListener: noop, hasListener: function () { return false; } };
+  var VINTED_TAB = { id: 1, index: 0, active: true, url: 'https://www.vinted.be/', title: 'Vinted' };
+  var store = { settings: D.settings };
+
+  window.chrome = {
+    runtime: {
+      id: 'demo',
+      lastError: undefined,
+      sendMessage: function (msg, cb) {
+        var a = msg && msg.action;
+        if (MUTATING.indexOf(a) !== -1) announce(a);
+        return later(cb, rsp(a));
+      },
+      getURL: function (p) { return '/' + String(p || '').replace(/^\/+/, ''); },
+      openOptionsPage: noop,
+      onMessage: listeners,
+      onInstalled: listeners,
+      onStartup: listeners,
+    },
+    storage: {
+      local: {
+        get: function (keys, cb) {
+          var out = {};
+          if (typeof keys === 'string') out[keys] = store[keys];
+          else if (Array.isArray(keys)) keys.forEach(function (k) { out[k] = store[k]; });
+          else if (keys && typeof keys === 'object') Object.keys(keys).forEach(function (k) { out[k] = store[k] !== undefined ? store[k] : keys[k]; });
+          else out = Object.assign({}, store);
+          return later(cb, out);
+        },
+        set: function (obj, cb) { Object.assign(store, obj); later(cb, undefined); return Promise.resolve(); },
+        remove: function (k, cb) { later(cb, undefined); return Promise.resolve(); },
+        clear: function (cb) { store = {}; later(cb, undefined); return Promise.resolve(); },
+      },
+      session: {
+        get: function (k, cb) { return later(cb, {}); },
+        set: function (o, cb) { later(cb, undefined); return Promise.resolve(); },
+        remove: function (k, cb) { later(cb, undefined); return Promise.resolve(); },
+      },
+      sync: { get: function (k, cb) { return later(cb, {}); }, set: function (o, cb) { later(cb, undefined); return Promise.resolve(); } },
+      onChanged: listeners,
+    },
+    tabs: {
+      query: function (q, cb) { return later(cb, [VINTED_TAB]); },
+      get: function (id, cb) { return later(cb, VINTED_TAB); },
+      sendMessage: function (id, msg, cb) {
+        var a = msg && msg.action;
+        var res = a === 'isLoggedIn' ? { success: true, loggedIn: true } : { success: true };
+        return later(cb, res);
+      },
+      create: function (o, cb) { return later(cb, VINTED_TAB); },
+      update: function (id, o, cb) { return later(cb, VINTED_TAB); },
+      onUpdated: listeners,
+      onActivated: listeners,
+    },
+    action: { openPopup: noop, setBadgeText: noop, setBadgeBackgroundColor: noop, setIcon: noop },
+    alarms: { create: noop, clear: noop, onAlarm: listeners },
+    notifications: { create: noop, onClicked: listeners },
+    windows: { create: noop },
+    i18n: { getUILanguage: function () { return 'en'; }, getMessage: function () { return ''; } },
+  };
+
+  // A popup window is at most 600px tall, so a real capture would cut the list
+  // off. ?full=1 lifts that cap (the sub-panels keep their own scroll, exactly
+  // as they do in the product) so the whole popup can be shown.
+  if (OPTS.full) {
+    var fs = document.createElement('style');
+    fs.textContent = 'body{max-height:none !important}' +
+      // ?whole=1 also opens the tab pane, so the site can show a complete list
+      // instead of a scroll-clipped one. The interactive demo never uses it:
+      // there the popup must scroll exactly like the real thing.
+      (OPTS.whole ? '.tab-content{max-height:none !important}' : '');
+    document.head.appendChild(fs);
+  }
+
+  window.addEventListener('load', function () {
+    setTimeout(function () {
+      if (OPTS.tab) {
+        var btn = document.querySelector('.tab-btn[data-tab="' + OPTS.tab + '"]');
+        if (btn) btn.click();
+      }
+      // Let the (async) render settle before scrolling / capturing.
+      setTimeout(function () {
+        if (OPTS.scroll) {
+          var pane = document.querySelector('.tab-content.active') || document.scrollingElement;
+          pane.scrollTop = OPTS.scroll === 'bottom' ? pane.scrollHeight : Number(OPTS.scroll) || 0;
+        }
+        document.documentElement.setAttribute('data-ready', '1');
+      }, 300);
+    }, 250);
+  });
+})();
+</script>
+<script src="options.js"></script>
+</body>
+</html>

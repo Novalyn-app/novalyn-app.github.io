@@ -1,0 +1,2346 @@
+/* =========================================================================
+   Novalyn — popup theme
+   Indigo -> violet brand system. One set of design tokens drives every
+   component so the popup, the toolbar icon and the store tile share a look.
+   ========================================================================= */
+
+:root {
+  color-scheme: light;
+  --nv-indigo: #4f46e5;
+  --nv-violet: #7c3aed;
+  --nv-grad: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+
+  --nv-bg: #f5f5fa;
+  --nv-surface: #ffffff;
+  --nv-surface-2: #f7f7fc;
+  --nv-border: #e7e6f2;
+  --nv-border-strong: #d9d7ea;
+
+  --nv-text: #1d1a33;
+  --nv-muted: #6c6885;
+
+  --nv-success: #16a34a;
+  --nv-success-fg: #0f7a38;
+  --nv-success-bg: #e7f6ec;
+  --nv-warn-fg: #8a5209;
+  --nv-warn-bg: #fef3c7;
+  --nv-danger: #dc2626;
+  --nv-danger-fg: #b02323;
+  --nv-danger-bg: #fee2e2;
+  --nv-info-fg: #3730a3;
+  --nv-info-bg: #eef0ff;
+
+  --nv-r-lg: 14px;
+  --nv-r: 12px;
+  --nv-r-sm: 9px;
+
+  --nv-shadow: 0 1px 2px rgba(29, 26, 51, 0.05), 0 4px 14px rgba(29, 26, 51, 0.06);
+  --nv-shadow-sm: 0 1px 2px rgba(29, 26, 51, 0.06);
+  --nv-ring: 0 0 0 3px rgba(99, 102, 241, 0.28);
+}
+
+/*
+ * Theme controls (Settings → Theme): the popup sets `<html data-theme>` to
+ * `auto` | `light` | `dark`.
+ *   - no attribute / `auto`  -> follow the OS (media query below)
+ *   - `light`                -> always light, even on a dark OS
+ *   - `dark`                 -> always dark, even on a light OS
+ * `color-scheme` is set alongside so native controls (selects, checkboxes,
+ * number inputs, scrollbars) match the chosen palette too.
+ */
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --nv-bg: #14121f;
+  --nv-surface: #1d1a2e;
+  --nv-surface-2: #262238;
+  --nv-border: #332e4a;
+  --nv-border-strong: #423c5e;
+
+  --nv-text: #edebf7;
+  --nv-muted: #a29fb8;
+
+  --nv-success: #4ade80;
+  --nv-success-fg: #86efac;
+  --nv-success-bg: #14301f;
+  --nv-warn-fg: #fbbf24;
+  --nv-warn-bg: #3a2a0b;
+  --nv-danger: #f87171;
+  --nv-danger-fg: #fca5a5;
+  --nv-danger-bg: #3a1616;
+  --nv-info-fg: #a5b4fc;
+  --nv-info-bg: #252150;
+
+  --nv-shadow: 0 1px 2px rgba(0, 0, 0, 0.45), 0 4px 14px rgba(0, 0, 0, 0.35);
+  --nv-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme='auto'],
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --nv-bg: #14121f;
+    --nv-surface: #1d1a2e;
+    --nv-surface-2: #262238;
+    --nv-border: #332e4a;
+    --nv-border-strong: #423c5e;
+
+    --nv-text: #edebf7;
+    --nv-muted: #a29fb8;
+
+    --nv-success: #4ade80;
+    --nv-success-fg: #86efac;
+    --nv-success-bg: #14301f;
+    --nv-warn-fg: #fbbf24;
+    --nv-warn-bg: #3a2a0b;
+    --nv-danger: #f87171;
+    --nv-danger-fg: #fca5a5;
+    --nv-danger-bg: #3a1616;
+    --nv-info-fg: #a5b4fc;
+    --nv-info-bg: #252150;
+
+    --nv-shadow: 0 1px 2px rgba(0, 0, 0, 0.45), 0 4px 14px rgba(0, 0, 0, 0.35);
+    --nv-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.45);
+  }
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 450px;
+  max-height: 600px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter',
+    'Helvetica Neue', Arial, sans-serif;
+  background: var(--nv-bg);
+  color: var(--nv-text);
+  font-size: 13px;
+  line-height: 1.45;
+  overflow-y: auto;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.container {
+  padding: 14px;
+}
+
+/* ------------------------------- header ------------------------------- */
+
+.header {
+  position: relative;
+  overflow: hidden;
+  background: var(--nv-grad);
+  color: #fff;
+  padding: 14px;
+  border-radius: var(--nv-r-lg);
+  margin-bottom: 12px;
+  box-shadow: var(--nv-shadow);
+}
+
+.header::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 130% at 85% 10%, rgba(255, 255, 255, 0.22), transparent 55%);
+  pointer-events: none;
+}
+
+.brand {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  line-height: 0;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.22));
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.header h1 {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  line-height: 1.15;
+}
+
+.brand-tagline {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Developer-build marker (stripped from production popup.html). */
+.dev-badge {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  z-index: 2;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #7a4b00;
+  background: #ffd54f;
+  border-radius: 6px;
+  padding: 2px 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* ----------------------------- status bar ----------------------------- */
+
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 11px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  background: var(--nv-surface-2);
+  color: var(--nv-muted);
+  border: 1px solid var(--nv-border);
+}
+
+.status-badge::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.status-badge.logged-in {
+  background: var(--nv-success-bg);
+  color: var(--nv-success-fg);
+  border-color: transparent;
+}
+
+.status-badge.not-logged-in {
+  background: var(--nv-danger-bg);
+  color: var(--nv-danger-fg);
+  border-color: transparent;
+}
+
+/* ---- not-signed-in state: the whole top area goes red ---- */
+
+.header.logged-out {
+  background: linear-gradient(135deg, #991b1b 0%, #dc2626 55%, #ef4444 100%);
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.28);
+}
+
+.status-bar.logged-out {
+  padding: 8px;
+  border: 1px solid rgba(220, 38, 38, 0.35);
+  border-radius: var(--nv-r);
+  background: var(--nv-danger-bg);
+}
+
+.status-bar.logged-out .status-badge {
+  background: #dc2626;
+  color: #fff;
+}
+
+.login-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(220, 38, 38, 0.45);
+  border-radius: var(--nv-r);
+  background: var(--nv-danger-bg);
+  color: var(--nv-danger-fg);
+}
+
+.login-banner[hidden] {
+  display: none;
+}
+
+.login-banner-icon {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #dc2626;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.login-banner-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+
+.login-banner-body strong {
+  font-size: 12px;
+}
+
+.login-banner-text {
+  opacity: 0.92;
+}
+
+.login-banner-actions {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* ----------------------------- licence bar ----------------------------- */
+
+.license-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.license-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 11px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  background: var(--nv-surface-2);
+  color: var(--nv-muted);
+  border: 1px solid var(--nv-border);
+}
+
+.license-status::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.license-status.paid {
+  background: var(--nv-success-bg);
+  color: var(--nv-success-fg);
+  border-color: transparent;
+}
+
+.license-status.free.capped {
+  background: var(--nv-warn-bg);
+  color: var(--nv-warn-fg);
+  border-color: transparent;
+}
+
+.btn-tiny {
+  flex: 0 0 auto;
+  min-width: 0;
+  padding: 4px 10px;
+  font-size: 11px;
+}
+
+/* ------------------------------ buttons ------------------------------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 88px;
+  padding: 8px 14px;
+  border: 1px solid transparent;
+  border-radius: var(--nv-r-sm);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  /* Labels are localised and can be much longer than English: let them wrap
+     inside the button instead of spilling out of it. */
+  text-align: center;
+  line-height: 1.2;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+  cursor: pointer;
+  color: #fff;
+  background: var(--nv-indigo);
+  transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s,
+    transform 0.05s, filter 0.15s;
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: var(--nv-ring);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--nv-grad);
+  box-shadow: 0 1px 3px rgba(79, 70, 229, 0.35);
+}
+
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(1.07);
+}
+
+.btn-secondary {
+  background: var(--nv-surface);
+  color: var(--nv-text);
+  border-color: var(--nv-border);
+  box-shadow: var(--nv-shadow-sm);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--nv-surface-2);
+  border-color: var(--nv-border-strong);
+}
+
+.btn-success {
+  background: var(--nv-success-bg);
+  color: var(--nv-success-fg);
+  border-color: rgba(22, 163, 74, 0.25);
+}
+
+.btn-success:hover:not(:disabled) {
+  filter: brightness(0.98);
+}
+
+.btn-warning {
+  background: var(--nv-warn-bg);
+  color: var(--nv-warn-fg);
+  border-color: rgba(180, 83, 9, 0.22);
+}
+
+.btn-warning:hover:not(:disabled) {
+  filter: brightness(0.98);
+}
+
+.btn-danger {
+  background: var(--nv-danger-bg);
+  color: var(--nv-danger-fg);
+  border-color: rgba(220, 38, 38, 0.22);
+}
+
+.btn-danger:hover:not(:disabled) {
+  filter: brightness(0.98);
+}
+
+/* -------------------------------- tabs -------------------------------- */
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 12px;
+  padding: 4px;
+  background: var(--nv-surface-2);
+  border: 1px solid var(--nv-border);
+  border-radius: var(--nv-r);
+}
+
+.tab-btn {
+  flex: 0 0 auto;
+  padding: 7px 10px;
+  border: none;
+  background: transparent;
+  color: var(--nv-muted);
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  border-radius: calc(var(--nv-r) - 4px);
+  cursor: pointer;
+  text-align: center;
+  line-height: 1.2;
+  white-space: nowrap;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+}
+
+.tab-btn:hover {
+  color: var(--nv-text);
+}
+
+.tab-btn.active {
+  background: var(--nv-surface);
+  color: var(--nv-indigo);
+  box-shadow: var(--nv-shadow-sm);
+}
+
+@media (prefers-color-scheme: dark) {
+  .tab-btn.active {
+    color: #a5b4fc;
+  }
+}
+
+.tab-content {
+  display: none;
+  background: var(--nv-surface);
+  border: 1px solid var(--nv-border);
+  border-radius: var(--nv-r);
+  padding: 14px;
+  margin-bottom: 12px;
+  max-height: 450px;
+  overflow-y: auto;
+  box-shadow: var(--nv-shadow-sm);
+}
+
+.tab-content.active {
+  display: block;
+  animation: nv-fade 0.18s ease;
+}
+
+@keyframes nv-fade {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+/* ---------------------------- form controls --------------------------- */
+
+select,
+input[type='text'],
+input[type='number'] {
+  font-family: inherit;
+  color: var(--nv-text);
+}
+
+.filters {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+/* Names the filter area, so the row does not open with a dropdown whose value
+   ("All statuses") reads like a section label. Deliberately stronger than a muted
+   caption: it has to look like a heading, with a hairline that separates the
+   filters from the list below. */
+.filter-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 4px 0 8px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--nv-border);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--nv-text);
+}
+
+.filters select,
+.filters input {
+  flex: 1;
+  min-width: 0;
+  padding: 7px 9px;
+  border: 1px solid var(--nv-border);
+  border-radius: var(--nv-r-sm);
+  font-size: 12px;
+  background: var(--nv-surface);
+}
+
+.filters input {
+  flex: 1.4;
+}
+
+.filters select:focus,
+.filters input:focus,
+.price-rule select:focus,
+.price-rule input:focus,
+.form-group input[type='number']:focus,
+.delay-row select:focus {
+  outline: none;
+  border-color: var(--nv-indigo);
+  box-shadow: var(--nv-ring);
+}
+
+.price-rule {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  background: var(--nv-surface-2);
+  border: 1px solid var(--nv-border);
+  border-radius: var(--nv-r-sm);
+}
+
+.price-rule label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--nv-text);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.price-rule select,
+.price-rule input {
+  padding: 6px 8px;
+  border: 1px solid var(--nv-border);
+  border-radius: 7px;
+  font-size: 12px;
+  background: var(--nv-surface);
+}
+
+.price-rule select {
+  flex: 1.2;
+  min-width: 0;
+}
+
+.price-rule input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ------------------------------ rate area ----------------------------- */
+
+.rate-warning {
+  border-radius: var(--nv-r-sm);
+  padding: 9px 11px;
+  font-size: 11.5px;
+  line-height: 1.45;
+  margin-bottom: 12px;
+  border: 1px solid transparent;
+}
+
+.rate-warning.warn {
+  background: var(--nv-warn-bg);
+  border-color: rgba(180, 83, 9, 0.25);
+  color: var(--nv-warn-fg);
+}
+
+.rate-warning.block {
+  background: var(--nv-danger-bg);
+  border-color: rgba(220, 38, 38, 0.28);
+  color: var(--nv-danger-fg);
+  font-weight: 600;
+}
+
+/* The message sits in its own span so a repaint never destroys the button
+   beside it (see `setBannerText` in popup.ts). */
+.rate-warning-text {
+  display: inline;
+}
+
+/* "Clear the pause": deliberately a quiet, secondary button. It stands a
+   safety cooldown down, so it should be findable but never the obvious click. */
+.rate-warning-actions {
+  margin-top: 6px;
+}
+
+/* ------------------------------ status toast ---------------------------- */
+/* Transient feedback for a completed action. Replaces the old window.alert,
+   which blocked the whole popup until dismissed — a bad fit for a message the
+   user only needs to glance at, and it hid the state change it was reporting. */
+
+.nv-toast-stack {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: stretch;
+  pointer-events: none;
+}
+
+.nv-toast {
+  background: var(--nv-surface);
+  color: var(--nv-text);
+  border: 1px solid var(--nv-border-strong);
+  border-left: 3px solid var(--nv-border-strong);
+  border-radius: var(--nv-r-sm);
+  padding: 9px 11px;
+  font-size: 11.5px;
+  line-height: 1.45;
+  /* A few messages carry two lines (the reason under "no listings found"), and
+     HTML would otherwise collapse the newline into a space. */
+  white-space: pre-line;
+  box-shadow: 0 6px 20px rgba(20, 18, 31, 0.16);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.nv-toast.nv-toast-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* A failure reads as a failure: same panel, red spine, matching text. */
+.nv-toast.nv-toast-error {
+  border-color: rgba(220, 38, 38, 0.28);
+  border-left-color: var(--nv-danger-fg);
+  color: var(--nv-danger-fg);
+}
+
+.nv-toast-stack:empty {
+  display: none;
+}
+
+.rate-usage {
+  font-size: 10.5px;
+  color: var(--nv-muted);
+  margin-bottom: 8px;
+  padding: 6px 8px;
+  background: var(--nv-surface-2);
+  border: 1px solid var(--nv-border);
+  border-radius: 7px;
+}
+
+.rate-usage.rate-warn {
+  color: var(--nv-warn-fg);
+  background: var(--nv-warn-bg);
+  border-color: rgba(180, 83, 9, 0.25);
+}
+
+.rate-usage.rate-block {
+  color: var(--nv-danger-fg);
+  background: var(--nv-danger-bg);
+  border-color: rgba(220, 38, 38, 0.28);
+  font-weight: 600;
+}
+
+/* ---------------------------- status chips ---------------------------- */
+
+.status-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: capitalize;
+  background: var(--nv-surface-2);
+  color: var(--nv-muted);
+}
+
+.status-tag.status-active {
+  background: var(--nv-success-bg);
+  color: var(--nv-success-fg);
+}
+.status-tag.status-sold {
+  background: var(--nv-danger-bg);
+  color: var(--nv-danger-fg);
+}
+.status-tag.status-reserved {
+  background: var(--nv-warn-bg);
+  color: var(--nv-warn-fg);
+}
+.status-tag.status-hidden {
+  background: var(--nv-surface-2);
+  color: var(--nv-muted);
+}
+.status-tag.status-draft {
+  background: var(--nv-info-bg);
+  color: var(--nv-info-fg);
+}
+.status-tag.status-under_review {
+  background: var(--nv-warn-bg);
+  color: var(--nv-warn-fg);
+}
+.status-tag.status-archived {
+  background: var(--nv-surface-2);
+  color: var(--nv-muted);
+}
+
+/* ------------------------------ listings ------------------------------ */
+
+.listings-info {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--nv-muted);
+  margin-bottom: 8px;
+  padding: 7px 9px;
+  background: var(--nv-surface-2);
+  border: 1px solid var(--nv-border);
+  border-radius: 7px;
+}
+
+/* "Updated at 14:32" — the quiet record of the automatic refresh. Pushed onto
+   its own line and dimmed further so it never competes with the counts. */
+.listings-updated {
+  flex-basis: 100%;
+  font-size: 10.5px;
+  opacity: 0.8;
+}
+
+.listings-updated:empty {
+  display: none;
+}
+
+.listings-list {
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--nv-muted);
+  font-size: 11.5px;
+  padding: 28px 14px;
+  line-height: 1.55;
+}
+
+.empty-state::before {
+  content: '✦';
+  display: block;
+  font-size: 20px;
+  line-height: 1;
+  margin-bottom: 10px;
+  color: var(--nv-violet);
+  opacity: 0.6;
+}
+
+.listing-item {
+  display: flex;
+  gap: 10px;
+  padding: 9px;
+  background: var(--nv-surface);
+  border: 1px solid var(--nv-border);
+  border-radius: var(--nv-r);
+  margin-bottom: 7px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.listing-item:hover {
+  border-color: var(--nv-border-strong);
+  box-shadow: var(--nv-shadow-sm);
+}
+
+.listing-checkbox {
+  width: 16px;
+  height: 16px;
+  margin-top: 3px;
+  accent-color: var(--nv-indigo);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.listing-image {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: var(--nv-r-sm);
+  flex-shrink: 0;
+  background: var(--nv-surface-2);
+}
+
+.listing-image.placeholder {
+  background: var(--nv-surface-2);
+  border: 1px dashed var(--nv-border-strong);
+}
+
+.listing-details {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  justify-content: center;
+}
+
+.listing-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--nv-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.listing-meta {
+  font-size: 10.5px;
+  color: var(--nv-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.listing-price {
+  font-weight: 700;
+  color: var(--nv-text);
+}
+
+.listing-date {
+  color: var(--nv-muted);
+  white-space: nowrap;
+}
+
+/* Traction: views / favourites as Vinted last reported them. Muted by default so
+   an unread ad does not shout, with the numbers in text colour — the count is the
+   point of the column, the rest is context. */
+.listing-traction {
+  color: var(--nv-muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.listing-traction.unknown {
+  opacity: 0.65;
+}
+
+/* Favourites reuse the muted traction style; the heart glyph keeps it distinct
+   from the views count next to it without needing a label of its own. */
+.listing-favourites {
+  font-variant-numeric: tabular-nums;
+}
+
+/* "Only 1 photo" — a quiet chip, not an error: a one-photo ad is allowed, it just
+   tends to be the reason nobody clicks. */
+.listing-photos {
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 9.5px;
+  font-weight: 700;
+  background: var(--nv-warn-bg);
+  color: var(--nv-warn-fg);
+  white-space: nowrap;
+}
+
+/* ---------------------------- first-run hint -------------------------- */
+
+.onboarding-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 9px 10px;
+  border-radius: var(--nv-r-sm);
+  background: var(--nv-surface-2);
+  border: 1px solid var(--nv-border);
+}
+
+.onboarding-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--nv-muted);
+}
+
+.onboarding-text strong {
+  color: var(--nv-text);
+  font-size: 11.5px;
+}
+
+.onboarding-dismiss {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--nv-muted);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.onboarding-dismiss:hover {
+  background: var(--nv-border);
+  color: var(--nv-text);
+}
+
+/* The one rule that matters: never relist a Sold item. */
+.onboarding-warn {
+  margin-top: 3px;
+  padding: 5px 7px;
+  border-radius: var(--nv-r-sm);
+  background: var(--nv-warn-bg);
+  color: var(--nv-warn-fg);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+/* ---------------------------- free relists ---------------------------- */
+
+.free-relists {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  padding: 7px 10px;
+  border-radius: var(--nv-r-sm);
+  font-size: 11.5px;
+  background: var(--nv-surface-2);
+  color: var(--nv-muted);
+}
+
+.free-relists.low {
+  background: var(--nv-warn-bg);
+  color: var(--nv-warn-fg);
+}
+
+.free-relists .free-relists-cta {
+  margin-left: auto;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--nv-indigo);
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.photo-warning {
+  margin-bottom: 8px;
+  padding: 7px 9px;
+  border-radius: var(--nv-r-sm);
+  font-size: 11px;
+  line-height: 1.45;
+  background: var(--nv-warn-bg);
+  color: var(--nv-warn-fg);
+}
+
+/* --------------------------- impact summary --------------------------- */
+
+.impact-summary {
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: var(--nv-r-sm);
+  background: var(--nv-surface-2);
+  border: 1px solid var(--nv-border);
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--nv-muted);
+}
+
+.impact-summary h3 {
+  margin: 0 0 4px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--nv-text);
+}
+
+.impact-line {
+  font-variant-numeric: tabular-nums;
+}
+
+.impact-line strong {
+  color: var(--nv-text);
+}
+
+/* --------------------------- what's new ------------------------------- */
+
+.whats-new {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--nv-border);
+}
+
+.whats-new-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.whats-new-head h2 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--nv-text);
+}
+
+.whats-new-version {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--nv-indigo);
+  font-variant-numeric: tabular-nums;
+}
+
+.whats-new-list {
+  margin: 6px 0 0;
+  padding-left: 16px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--nv-muted);
+}
+
+.whats-new-list li + li {
+  margin-top: 3px;
+}
+
+.whats-new-note {
+  margin: 2px 0 6px;
+  font-size: 10px;
+  color: var(--nv-muted);
+}
+
+.whats-new-latest {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.whats-new-section h3 {
+  margin: 0 0 2px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--nv-text);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.whats-new-section ul {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--nv-muted);
+}
+
+.whats-new-section li + li {
+  margin-top: 3px;
+}
+
+.whats-new-history {
+  margin-top: 10px;
+  border-top: 1px solid var(--nv-border);
+  padding-top: 8px;
+  font-size: 11px;
+}
+
+.whats-new-history summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--nv-text);
+}
+
+.whats-new-history-list {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.whats-new-release {
+  border: 1px solid var(--nv-border);
+  border-radius: var(--nv-r-sm);
+  padding: 6px 8px;
+  background: var(--nv-surface-2);
+}
+
+.whats-new-release summary {
+  font-size: 10.5px;
+  color: var(--nv-muted);
+}
+
+.whats-new-release[open] summary {
+  margin-bottom: 6px;
+  color: var(--nv-text);
+}
+
+.whats-new-release .whats-new-section {
+  margin-top: 6px;
+}
+
+/* ---------------------------- forms / batch --------------------------- */
+
+.form-group {
+  margin-bottom: 10px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: var(--nv-text);
+}
+
+.form-group input[type='number'] {
+  width: 100%;
+  padding: 7px 9px;
+  border: 1px solid var(--nv-border);
+  border-radius: var(--nv-r-sm);
+  font-size: 12.5px;
+  background: var(--nv-surface);
+}
+
+.form-group input[type='checkbox'] {
+  width: 15px;
+  height: 15px;
+  vertical-align: -2px;
+  margin-right: 7px;
+  accent-color: var(--nv-indigo);
+  cursor: pointer;
+}
+
+.delay-row {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+}
+
+.delay-row input[type='number'] {
+  flex: 1.4;
+  min-width: 0;
+  width: auto;
+}
+
+.delay-row select {
+  flex: 1;
+  min-width: 0;
+  padding: 7px 9px;
+  border: 1px solid var(--nv-border);
+  border-radius: var(--nv-r-sm);
+  font-size: 12.5px;
+  background: var(--nv-surface);
+}
+
+/* Calm, always-visible explanation under a field. */
+.field-hint {
+  margin-top: 5px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--nv-muted);
+}
+
+/* A real warning about a risky value: only shown when the value is dangerous,
+   so it reads as a consequence of the choice rather than decoration. */
+.field-warning {
+  margin-top: 6px;
+  padding: 7px 9px;
+  border-radius: var(--nv-r-sm);
+  font-size: 11px;
+  line-height: 1.45;
+  background: var(--nv-danger-bg);
+  border: 1px solid rgba(220, 38, 38, 0.28);
+  color: var(--nv-danger-fg);
+}
+
+.batch-actions {
+  margin-bottom: 10px;
+}
+
+.batch-info {
+  background: var(--nv-surface-2);
+  padding: 10px;
+  border-radius: var(--nv-r-sm);
+  margin-bottom: 10px;
+  border: 1px solid var(--nv-border);
+}
+
+.batch-stats {
+  font-size: 11.5px;
+  color: var(--nv-text);
+  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.batch-stats span {
+  font-weight: 600;
+}
+
+.batch-next {
+  color: var(--nv-info-fg);
+}
+
+.progress-bar {
+  width: 100%;
+  height: 10px;
+  background: var(--nv-border);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0;
+  background: var(--nv-grad);
+  border-radius: 999px;
+  transition: width 0.35s ease;
+}
+
+.batch-controls {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.batch-controls .btn {
+  flex: 1;
+  min-width: 64px;
+  font-size: 11.5px;
+  padding: 6px 8px;
+}
+
+.batch-clear {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--nv-border);
+}
+
+.batch-clear .btn {
+  font-size: 11.5px;
+  padding: 5px 10px;
+}
+
+.batch-jobs {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 10px;
+}
+
+.batch-job-item {
+  padding: 7px 9px;
+  border: 1px solid var(--nv-border);
+  border-left: 3px solid var(--nv-border);
+  border-radius: 7px;
+  margin-bottom: 5px;
+  font: inherit;
+  font-size: 10.5px;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.batch-job-item > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.batch-job-item.pending {
+  background: var(--nv-warn-bg);
+  border-color: rgba(180, 83, 9, 0.25);
+  border-left-color: #d97706;
+  color: var(--nv-warn-fg);
+}
+
+.batch-job-item.running {
+  background: var(--nv-info-bg);
+  border-color: rgba(79, 70, 229, 0.25);
+  border-left-color: var(--nv-indigo);
+  color: var(--nv-info-fg);
+}
+
+.batch-job-item.completed {
+  background: var(--nv-success-bg);
+  border-color: rgba(22, 163, 74, 0.25);
+  border-left-color: var(--nv-success);
+  color: var(--nv-success-fg);
+}
+
+.batch-job-item.failed {
+  background: var(--nv-danger-bg);
+  border-color: rgba(220, 38, 38, 0.25);
+  border-left-color: var(--nv-danger);
+  color: var(--nv-danger-fg);
+}
+
+/* -------------------------- history / archive ------------------------- */
+
+.history-actions {
+  margin-bottom: 10px;
+}
+
+.history-list {
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.history-item {
+  padding: 8px 10px;
+  border: 1px solid var(--nv-border);
+  border-left: 3px solid var(--nv-border);
+  border-radius: 7px;
+  margin-bottom: 5px;
+  font-size: 10.5px;
+}
+
+.history-item.success {
+  background: var(--nv-success-bg);
+  border-color: rgba(22, 163, 74, 0.25);
+  border-left-color: var(--nv-success);
+}
+
+.history-item.failure {
+  background: var(--nv-danger-bg);
+  border-color: rgba(220, 38, 38, 0.25);
+  border-left-color: var(--nv-danger);
+}
+
+.history-item .title {
+  font-weight: 600;
+  color: var(--nv-text);
+  margin-bottom: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.history-item .meta {
+  color: var(--nv-muted);
+  font-size: 9.5px;
+}
+
+.archive-item {
+  padding: 8px 10px;
+  border: 1px solid var(--nv-border);
+  border-left: 3px solid var(--nv-border);
+  border-radius: 7px;
+  margin-bottom: 5px;
+  font-size: 10.5px;
+  background: var(--nv-surface);
+}
+
+.archive-item .title {
+  font-weight: 600;
+  color: var(--nv-text);
+  margin-bottom: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.archive-item .meta {
+  color: var(--nv-muted);
+  font-size: 9.5px;
+}
+
+.archive-item.archive-trouble {
+  background: var(--nv-warn-bg);
+  border-color: rgba(180, 83, 9, 0.25);
+  border-left-color: #d97706;
+}
+
+.archive-item.archive-restored {
+  background: var(--nv-success-bg);
+  border-color: rgba(22, 163, 74, 0.25);
+  border-left-color: var(--nv-success);
+}
+
+/* ------------------------------- debug -------------------------------- */
+
+.debug-box {
+  background: var(--nv-surface-2);
+  border: 1px solid var(--nv-border);
+  border-radius: 7px;
+  padding: 8px;
+  font-size: 10px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin-bottom: 8px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.debug-log {
+  background: #12101c;
+  color: #cfcbe4;
+  border-radius: 7px;
+  padding: 9px;
+  font-size: 10px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.capture-box {
+  background: var(--nv-surface-2);
+  border: 1px solid var(--nv-border);
+  border-radius: 7px;
+  padding: 9px;
+  margin-bottom: 8px;
+}
+
+.capture-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--nv-text);
+  margin-bottom: 4px;
+}
+
+.capture-hint {
+  font-size: 9.5px;
+  color: var(--nv-muted);
+  line-height: 1.45;
+  margin-bottom: 7px;
+}
+
+.capture-status {
+  font-size: 10px;
+  color: var(--nv-muted);
+  margin-top: 5px;
+  padding: 5px 7px;
+  background: var(--nv-border);
+  border-radius: 6px;
+}
+
+.capture-status.recording {
+  background: var(--nv-danger-bg);
+  color: var(--nv-danger-fg);
+  font-weight: 600;
+}
+
+#btnSaveSettings {
+  width: 100%;
+  margin-top: 8px;
+}
+
+/* ------------------------------ scrollbars ---------------------------- */
+
+.tab-content::-webkit-scrollbar,
+.listings-list::-webkit-scrollbar,
+.batch-jobs::-webkit-scrollbar,
+.history-list::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.tab-content::-webkit-scrollbar-track,
+.listings-list::-webkit-scrollbar-track,
+.batch-jobs::-webkit-scrollbar-track,
+.history-list::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tab-content::-webkit-scrollbar-thumb,
+.listings-list::-webkit-scrollbar-thumb,
+.batch-jobs::-webkit-scrollbar-thumb,
+.history-list::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
+  background: var(--nv-border-strong);
+  border-radius: 999px;
+}
+
+.tab-content::-webkit-scrollbar-thumb:hover,
+.listings-list::-webkit-scrollbar-thumb:hover,
+.batch-jobs::-webkit-scrollbar-thumb:hover,
+.history-list::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover {
+  background: var(--nv-muted);
+}
+
+/* ---------------------------- automation ------------------------------ */
+
+.form-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.form-row .form-group {
+  flex: 1;
+  min-width: 0;
+}
+
+.form-group input[type='text'],
+.form-group input[type='time'],
+.form-group select {
+  width: 100%;
+  padding: 7px 9px;
+  border: 1px solid var(--nv-border);
+  border-radius: var(--nv-r-sm);
+  font-size: 12.5px;
+  background: var(--nv-surface);
+}
+
+.muted {
+  color: var(--nv-muted);
+  font-size: 10.5px;
+}
+
+.switch-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--nv-text);
+  cursor: pointer;
+}
+
+.switch-label input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--nv-indigo);
+  cursor: pointer;
+}
+
+.automation-head {
+  margin-bottom: 12px;
+}
+
+.automation-head .capture-hint {
+  margin-top: 8px;
+}
+
+.automation-warn {
+  font-size: 10.5px;
+  line-height: 1.45;
+  color: var(--nv-warn-fg);
+  background: var(--nv-warn-bg);
+  border: 1px solid rgba(180, 83, 9, 0.22);
+  border-radius: var(--nv-r-sm);
+  padding: 8px 10px;
+  margin: 8px 0 0;
+}
+
+.automation-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--nv-text);
+  margin: 14px 0 8px;
+}
+
+.automation-section-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.automation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.automation-plan {
+  background: var(--nv-info-bg);
+  border: 1px solid rgba(55, 48, 163, 0.18);
+  border-radius: var(--nv-r-sm);
+  padding: 10px 12px;
+  margin-bottom: 4px;
+}
+
+/* The empty state occupies the same slot but must not look like an
+   announcement: a tinted panel with one grey line in it reads as "something is
+   waiting here" and invites a second look. */
+.automation-plan.automation-plan-empty {
+  background: none;
+  border-color: transparent;
+  padding: 2px 2px 6px;
+}
+
+.automation-plan-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--nv-info-fg);
+}
+
+.automation-plan-rule {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--nv-text);
+  margin-top: 4px;
+}
+
+.automation-plan-items {
+  margin: 6px 0;
+  padding-left: 18px;
+  font-size: 10.5px;
+  color: var(--nv-muted);
+  max-height: 110px;
+  overflow-y: auto;
+}
+
+.automation-plan-items li {
+  overflow-wrap: anywhere;
+}
+
+.rule-editor {
+  background: var(--nv-surface-2);
+  border: 1px solid var(--nv-border);
+  border-radius: var(--nv-r-sm);
+  padding: 12px;
+  margin-top: 10px;
+}
+
+.checkbox-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+
+.checkbox-grid label,
+.day-grid label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--nv-text);
+  cursor: pointer;
+}
+
+.checkbox-grid input[type='checkbox'],
+.day-grid input[type='checkbox'] {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: var(--nv-indigo);
+  cursor: pointer;
+}
+
+.day-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+}
+
+.automation-preview {
+  font-size: 10.5px;
+  color: var(--nv-muted);
+  background: var(--nv-surface);
+  border: 1px solid var(--nv-border);
+  border-radius: 7px;
+  padding: 6px 8px;
+  margin-bottom: 10px;
+}
+
+.rule-card {
+  background: var(--nv-surface);
+  border: 1px solid var(--nv-border);
+  border-radius: var(--nv-r-sm);
+  padding: 10px 12px;
+}
+
+.rule-card.disabled {
+  opacity: 0.62;
+}
+
+.rule-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--nv-text);
+  margin-bottom: 4px;
+}
+
+.rule-card .actions {
+  margin: 8px 0 0;
+}
+
+.badge-muted {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--nv-muted);
+  background: var(--nv-surface-2);
+  border: 1px solid var(--nv-border);
+  border-radius: 999px;
+  padding: 1px 7px;
+}
+
+.run-item {
+  background: var(--nv-surface);
+  border: 1px solid var(--nv-border);
+  border-left: 3px solid var(--nv-border-strong);
+  border-radius: var(--nv-r-sm);
+  padding: 8px 10px;
+}
+
+.run-item .title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--nv-text);
+  overflow-wrap: anywhere;
+}
+
+.run-item .meta {
+  font-size: 10px;
+  color: var(--nv-muted);
+  margin-top: 2px;
+}
+
+.run-item.run-completed {
+  border-left-color: var(--nv-success);
+}
+
+.run-item.run-failed {
+  border-left-color: var(--nv-danger);
+}
+
+.run-item.run-running {
+  border-left-color: var(--nv-indigo);
+}
+
+/* ---- confirmation sheet (dry-run before a batch) ---- */
+
+.sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(20, 18, 31, 0.45);
+}
+.sheet[hidden] {
+  display: none;
+}
+.sheet-card {
+  width: 100%;
+  max-width: 340px;
+  /* A sheet taller than a short popup window would otherwise be clipped at the
+     top and bottom (the overlay centres it), with no way to reach the buttons.
+     The export sheet is the tallest one, so the card scrolls instead. */
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  padding: 16px;
+  background: var(--nv-surface);
+  border: 1px solid var(--nv-border-strong);
+  border-radius: var(--nv-r);
+  box-shadow: var(--nv-shadow);
+}
+.sheet-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.sheet-body {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--nv-muted);
+}
+.sheet-body p {
+  margin-bottom: 6px;
+}
+.sheet-skip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--nv-muted);
+  margin: 12px 0;
+  cursor: pointer;
+}
+.sheet-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* ---- health strip (single glance: pace, last batch) ---- */
+
+.health {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  margin-bottom: 8px;
+  border: 1px solid var(--nv-border);
+  border-radius: var(--nv-r-sm);
+  background: var(--nv-surface);
+  font-size: 12px;
+}
+.health[hidden] {
+  display: none;
+}
+.health-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--nv-success);
+}
+.health.warn .health-dot {
+  background: var(--nv-warn-fg);
+}
+.health.block .health-dot {
+  background: var(--nv-danger);
+}
+.health-text {
+  font-weight: 600;
+}
+.health-meta {
+  margin-left: auto;
+  color: var(--nv-muted);
+  font-size: 11px;
+  text-align: right;
+}
+
+/* ---- opportunity radar ---- */
+
+.opp-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 6px;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.opp-badge.renew {
+  background: var(--nv-info-bg);
+  color: var(--nv-info-fg);
+}
+.opp-badge.price {
+  background: var(--nv-warn-bg);
+  color: var(--nv-warn-fg);
+}
+
+/* `hidden` must win over component display rules: a class like `.onboarding-hint
+   { display: flex }` beats the UA `[hidden]` rule, which made the dismiss button
+   set `hidden` without hiding anything. */
+[hidden] {
+  display: none !important;
+}
+
+/* ---- onboarding checklist ---- */
+
+.checklist-progress {
+  color: var(--nv-muted);
+  font-size: 10.5px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+.checklist {
+  list-style: none;
+  margin: 2px 0 4px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.checklist li {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  color: var(--nv-muted);
+}
+.checklist li.done {
+  color: var(--nv-text);
+}
+.checklist-mark {
+  display: inline-block;
+  width: 12px;
+  color: var(--nv-success);
+  font-weight: 700;
+}
+.checklist li:not(.done) .checklist-mark {
+  color: var(--nv-border-strong);
+}
+
+/* ---- duplicates warning ---- */
+
+.duplicate-warning {
+  cursor: pointer;
+}
+.warning-link {
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+  padding: 0;
+}
+.warning-link:hover {
+  text-decoration: underline;
+}
+
+/* ---- health check link ---- */
+
+.health-link {
+  flex: 0 0 auto;
+  border: 1px solid var(--nv-border-strong);
+  background: none;
+  color: var(--nv-muted);
+  font: inherit;
+  font-size: 10.5px;
+  padding: 2px 7px;
+  border-radius: var(--nv-r-sm);
+  cursor: pointer;
+}
+.health-link:hover {
+  color: var(--nv-text);
+  border-color: var(--nv-text);
+}
+
+/* ---- smart relist sheet ---- */
+
+.sheet-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 8px 0;
+  font-size: 12.5px;
+}
+.sheet-field select {
+  font: inherit;
+  font-size: 12.5px;
+  padding: 4px 6px;
+  border: 1px solid var(--nv-border-strong);
+  border-radius: var(--nv-r-sm);
+  background: var(--nv-surface);
+  color: var(--nv-text);
+}
+.sheet-hint {
+  margin-top: 6px;
+  color: var(--nv-muted);
+  font-size: 11.5px;
+}
+
+/* ---- cross-listing export sheet ---- */
+
+.sheet-field input {
+  width: 118px;
+  font: inherit;
+  font-size: 12.5px;
+  padding: 4px 6px;
+  border: 1px solid var(--nv-border-strong);
+  border-radius: var(--nv-r-sm);
+  background: var(--nv-surface);
+  color: var(--nv-text);
+}
+/* `.sheet-field` sets `display: flex`, which beats the UA rule for [hidden], so
+   the eBay-only fields need this to be hideable when the generic format is picked. */
+.sheet-field[hidden] {
+  display: none;
+}
+/* The chosen eBay site sets the currency of every price, so a mismatch between
+   the ads' currency and the site's is stated in the warning colours rather than
+   left for the seller to discover after the listings go live. */
+.crosslist-warn {
+  margin-top: 8px;
+  padding: 7px 9px;
+  border-radius: var(--nv-r-sm);
+  font-size: 11px;
+  line-height: 1.45;
+  background: var(--nv-warn-bg);
+  color: var(--nv-warn-fg);
+}
+
+/* ---- results tab ---- */
+
+.results-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.results-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.results-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 9px 10px;
+  background: var(--nv-surface-2);
+  border: 1px solid var(--nv-border);
+  border-radius: var(--nv-r-sm);
+}
+.results-value {
+  font-size: 16px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.results-label {
+  font-size: 10.5px;
+  color: var(--nv-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.results-toggle {
+  margin-top: 4px;
+}
+.results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}
+.result-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--nv-border);
+  border-radius: var(--nv-r-sm);
+  background: var(--nv-surface);
+}
+.result-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.result-title {
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.result-meta {
+  font-size: 10.5px;
+  color: var(--nv-muted);
+  font-variant-numeric: tabular-nums;
+}
+.result-flag {
+  flex: 0 0 auto;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(217, 119, 6, 0.14);
+  color: #b45309;
+}
+
+/* ---- batch summary + retry ---- */
+
+.batch-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--nv-border);
+  border-radius: var(--nv-r-sm);
+  background: var(--nv-surface-2);
+  font-size: 11.5px;
+}
+.batch-summary-text {
+  color: var(--nv-muted);
+}
+
+/* ---- backup status line ---- */
+
+#backupStatus.backup-stale {
+  color: var(--nv-danger-fg);
+}
+
+.results-value.negative {
+  color: var(--nv-danger-fg);
+}
+
+/* ---- best time, suggestions, listing strength ---- */
+
+.best-time {
+  margin: 6px 0 2px;
+  padding: 7px 10px;
+  border: 1px solid var(--nv-border);
+  border-radius: var(--nv-r-sm);
+  background: var(--nv-surface-2);
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--nv-text);
+}
+.best-time-hint {
+  color: var(--nv-muted);
+}
+.opp-suggest {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.14);
+  color: #047857;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  cursor: help;
+}
+.listing-score {
+  min-width: 24px;
+  padding: 1px 5px;
+  border: 1px solid var(--nv-border);
+  border-radius: 999px;
+  background: var(--nv-surface-2);
+  color: var(--nv-muted);
+  font: inherit;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+.listing-score.good {
+  border-color: rgba(16, 185, 129, 0.35);
+  background: rgba(16, 185, 129, 0.12);
+  color: #047857;
+}
+.listing-score.warn {
+  border-color: rgba(217, 119, 6, 0.35);
+  background: rgba(217, 119, 6, 0.12);
+  color: #b45309;
+}
+.listing-score.bad {
+  border-color: rgba(220, 38, 38, 0.35);
+  background: rgba(220, 38, 38, 0.12);
+  color: #b91c1c;
+}
+.listing-score:hover {
+  filter: brightness(0.96);
+}
+.sheet-switch {
+  margin-top: 4px;
+}
+
+/* ------------------------------------------------------------------ *
+ * Weekly action list
+ *
+ * The one panel that answers "what do I do now?". It is styled as advice, not
+ * as an alert: a tinted card, a dot per item, and one round button. Nothing in
+ * it is red unless a task actually failed - red is reserved for the safety
+ * banner, and using it twice would teach the user to ignore both.
+ * ------------------------------------------------------------------ */
+.weekly-panel {
+  margin: 0 0 12px;
+  padding: 11px 12px 12px;
+  border-radius: var(--nv-r);
+  background: var(--nv-info-bg);
+  border: 1px solid var(--nv-border);
+}
+.weekly-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+.weekly-head strong {
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--nv-info-fg);
+}
+.weekly-count {
+  font-size: 11px;
+  color: var(--nv-muted);
+}
+.weekly-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.weekly-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--nv-text);
+}
+.weekly-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--nv-indigo);
+  margin-top: 5px;
+  flex: none;
+}
+.weekly-item--fix .weekly-dot {
+  background: var(--nv-warn-fg);
+}
+.weekly-label {
+  flex: 1;
+}
+.weekly-pick {
+  flex: none;
+  border: 1px solid var(--nv-border-strong);
+  background: var(--nv-surface);
+  color: var(--nv-indigo);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.weekly-pick:hover {
+  background: var(--nv-indigo);
+  border-color: var(--nv-indigo);
+  color: #fff;
+}
+.weekly-summary {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: var(--nv-muted);
+}

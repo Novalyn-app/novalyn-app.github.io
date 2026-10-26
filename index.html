@@ -3,26 +3,32 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Novalyn — Relist &amp; Refresh</title>
-  <meta name="description" content="Novalyn is a Chrome extension that bulk-relists your own Vinted listings — photos and details copied, originals removed, with a full backup. Free for your first 50 relists." />
+  <title>Novalyn — bulk relist Vinted listings without losing the original</title>
+  <meta name="description" content="Bulk relist your own Vinted listings. Novalyn publishes the copy, confirms it is live, archives the original — and only then deletes it. 50 relists free, no account." />
   <link rel="icon" type="image/png" href="assets/icon-128.png" />
   <link rel="apple-touch-icon" href="assets/icon-128.png" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="canonical" href="https://novalyn-app.github.io/" />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Novalyn — Relist &amp; Refresh" />
-  <meta property="og:description" content="Bulk-relist your own Vinted listings in a few clicks. No account, no copy-paste." />
-  <meta property="og:image" content="assets/icon-128.png" />
+  <meta property="og:title" content="Novalyn — relist your Vinted listings without losing the original" />
+  <meta property="og:description" content="Bulk relist your own Vinted ads: photos and details copied, the copy confirmed live, the original archived — and only then removed." />
+  <meta property="og:image" content="assets/shots/popup-listings.png" />
+  <meta property="og:url" content="https://novalyn-app.github.io/" />
   <!--
     ============================================================
-    TO FINISH BEFORE PUBLISHING
+    TO KEEP IN SYNC
     ------------------------------------------------------------
-    1. STRIPE PAYMENT LINKS (live; EUR; prices include VAT)
+    1. CHROME WEB STORE URL ..... the `store` link below. It is the only
+       route from this site to the install; the store item points back here
+       as its support site, so this link closes the loop.
+    2. STRIPE PAYMENT LINKS (live; EUR; prices include VAT)
          monthly  .... https://buy.stripe.com/cNi9AT2Gc8ER0JR6e2dIA00
          yearly   .... https://buy.stripe.com/eVq6oHfsY3kx0JR31QdIA01
          lifetime .... https://buy.stripe.com/9B6dR9eoU08l64b7i6dIA02
        These three must stay in sync with CHECKOUT_LINKS in
        src/core/licenseApi.ts of the extension repo.
-    2. CHROME WEB STORE URL ..... https://chromewebstore.google.com/detail/REPLACE
+    3. SCREENSHOTS: assets/shots/*.png are generated from the real popup by
+       `node scripts/site-demo.mjs` in the extension repo. Do not hand-edit.
     ============================================================
   -->
 </head>
@@ -36,11 +42,11 @@
         <span>Novalyn</span>
       </a>
       <nav class="nav" aria-label="Main">
-        <a href="#how">How it works</a>
+        <a href="#safe">Why it is safe</a>
         <a href="#features">Features</a>
         <a href="#pricing">Pricing</a>
         <a href="#faq">FAQ</a>
-        <a class="btn btn--primary btn--sm" href="#pricing">Get a licence</a>
+        <a class="btn btn--primary btn--sm" href="https://chromewebstore.google.com/detail/novalyn-%E2%80%94-vinted-relister/flnfapmkkmegfpbakndnlgehimpfccic">Add to Chrome</a>
       </nav>
     </div>
   </header>
@@ -50,56 +56,225 @@
     <section class="hero">
       <div class="wrap hero-grid">
         <div>
-          <span class="eyebrow"><span class="dot"></span> Free for your first 50 relists</span>
-          <h1>Relist your listings in a few clicks, <span class="grad">not an afternoon.</span></h1>
+          <span class="eyebrow"><span class="dot"></span> 5.0 ★ on the Chrome Web Store · 50 relists free</span>
+          <h1>Relist your Vinted ads — <span class="grad">without losing the original first.</span></h1>
           <p class="lede">
-            Novalyn is a Chrome extension that clones your own Vinted listings — photos,
-            title, description, category, size, all of it — then removes the originals.
-            It runs quietly in the background while you get on with your day.
+            Novalyn clones your own listings in bulk: photos, title, description, category,
+            brand and size. Each copy is confirmed live, the original is archived, and only
+            then is the old ad removed. If Vinted answers with something unclear, Novalyn
+            checks your wardrobe instead of guessing.
           </p>
           <div class="cta-row">
-            <a class="btn btn--primary" href="#pricing">Get a licence</a>
-            <a class="btn btn--ghost" href="#how">See how it works</a>
+            <a class="btn btn--primary" href="https://chromewebstore.google.com/detail/novalyn-%E2%80%94-vinted-relister/flnfapmkkmegfpbakndnlgehimpfccic">Add to Chrome — free</a>
+            <a class="btn btn--ghost" href="demo/">Try the popup</a>
           </div>
           <div class="trust">
             <span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
-              50 relists free
+              No account, no password
             </span>
             <span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
-              No account needed
+              29 Vinted marketplaces
             </span>
             <span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
-              29 marketplaces
+              Works in the tab you are already signed in to
             </span>
           </div>
         </div>
 
-        <div class="mock" aria-hidden="true">
-          <div class="mock-bar"><i></i><i></i><i></i><span class="t">Novalyn — My listings</span></div>
-          <div class="mock-body">
-            <div class="mock-row"><span class="mock-thumb"></span><span class="mock-lines"><b></b><b></b></span><span class="mock-check"></span></div>
-            <div class="mock-row"><span class="mock-thumb b"></span><span class="mock-lines"><b></b><b></b></span><span class="mock-check"></span></div>
-            <div class="mock-row"><span class="mock-thumb c"></span><span class="mock-lines"><b></b><b></b></span><span class="mock-check"></span></div>
-            <div class="mock-progress"><i></i></div>
-            <div class="mock-note">Relisting 34 / 50 · pause, resume or cancel at any time</div>
+        <figure class="shot-frame" style="margin:0">
+          <div class="shot-clip shot-clip--hero">
+            <img class="shot" src="assets/shots/popup-listings.png" width="700" height="1276"
+                 alt="The Novalyn popup: your Vinted listings with checkboxes, a Relist button and price-rule controls." />
           </div>
+          <figcaption>The real popup, filled with sample data — <a href="demo/">open the demo</a> to click it.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- The order is the safety -->
+    <section class="section" id="safe">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>The order is the safety</h2>
+          <p>Vinted has no one-tap relist. A “relist” is a clone: a new ad with the same
+            content, and the old one deleted. Everything depends on <em>when</em> that
+            delete happens.</p>
+        </div>
+
+        <div class="order">
+          <div class="order-step">
+            <div class="n">1</div>
+            <h3>Copy</h3>
+            <p>A new ad is built from your own listing — photos re-uploaded, every field carried over.</p>
+          </div>
+          <div class="order-step">
+            <div class="n">2</div>
+            <h3>Confirm</h3>
+            <p>The copy must come back with a real item id and be found in your wardrobe before anything else happens.</p>
+          </div>
+          <div class="order-step">
+            <div class="n">3</div>
+            <h3>Archive</h3>
+            <p>A complete backup of the original is stored on your computer first, so it can always be restored.</p>
+          </div>
+          <div class="order-step order-step--last">
+            <div class="n">4</div>
+            <h3>Delete</h3>
+            <p>Only now is the old ad removed. If the copy cannot be confirmed, nothing is deleted and the batch stops.</p>
+          </div>
+        </div>
+
+        <p class="small muted" style="margin-top:22px;max-width:64em">
+          This is where relisting tools usually go wrong: delete first, create second, and a
+          failed upload leaves the seller with nothing to sell. Novalyn was built the other
+          way round, and it will stop the whole batch rather than take that risk on your
+          behalf.
+        </p>
+      </div>
+    </section>
+
+    <!-- Comparison -->
+    <section class="section section--soft">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>How that compares</h2>
+          <p>Most relisting tools are scripts around the same two requests. The difference is
+            what happens when the second one fails.</p>
+        </div>
+
+        <div class="compare-wrap">
+          <table class="compare">
+            <thead>
+              <tr>
+                <th scope="col">What matters</th>
+                <th scope="col">By hand</th>
+                <th scope="col">Typical delete-first tool</th>
+                <th scope="col" class="us">Novalyn</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">The original is removed</th>
+                <td>After you uploaded the copy</td>
+                <td>Before the copy exists, in some tools</td>
+                <td class="us"><span class="yes">Only after the copy is confirmed live</span></td>
+              </tr>
+              <tr>
+                <th scope="row">A failed upload costs you</th>
+                <td>An afternoon</td>
+                <td>The ad itself</td>
+                <td class="us"><span class="yes">Nothing — the original stays, the batch stops</span></td>
+              </tr>
+              <tr>
+                <th scope="row">Full backup of each original</th>
+                <td>If you remembered</td>
+                <td>Usually not</td>
+                <td class="us"><span class="yes">Archived before every delete</span></td>
+              </tr>
+              <tr>
+                <th scope="row">Vinted asks for verification</th>
+                <td>You notice and stop</td>
+                <td>Often retried, which makes it worse</td>
+                <td class="us"><span class="yes">Stops and waits before touching Vinted again</span></td>
+              </tr>
+              <tr>
+                <th scope="row">Unclear answer from Vinted</th>
+                <td>Check your wardrobe</td>
+                <td>Guess, or try again</td>
+                <td class="us"><span class="yes">Reads your wardrobe, then decides</span></td>
+              </tr>
+              <tr>
+                <th scope="row">Did the relist actually work?</th>
+                <td>Compare by eye</td>
+                <td>No data</td>
+                <td class="us"><span class="yes">Views per day before vs. after, per ad</span></td>
+              </tr>
+              <tr>
+                <th scope="row">Sales, costs and profit</th>
+                <td>A spreadsheet</td>
+                <td>Not included</td>
+                <td class="us"><span class="yes">Built in, in your market's currency</span></td>
+              </tr>
+              <tr>
+                <th scope="row">Price to try it</th>
+                <td>Your time</td>
+                <td>Free, or a subscription</td>
+                <td class="us"><span class="yes">First 50 relists free, no account</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="small muted" style="margin-top:16px">
+          The middle column describes how the most commonly installed relisting tools work
+          today (checked October 2026) — they change, so check before you buy one.
+        </p>
+      </div>
+    </section>
+
+    <!-- Screenshots -->
+    <section class="section">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>What you actually get</h2>
+          <p>No mock-ups: every image below is the shipped extension, filled with sample data.</p>
+        </div>
+
+        <div class="shot-grid">
+          <figure class="shot-frame" style="margin:0">
+            <div class="shot-clip shot-clip--tall">
+              <img class="shot" src="assets/shots/popup-archive.png" width="700" height="1189" loading="lazy"
+                   alt="The Archive tab, listing every saved original with a restore button." />
+            </div>
+            <figcaption>
+              <strong>Archive — nothing is ever really gone</strong>
+              Every original is saved with its photos, price and details. One click restores it to your list.
+            </figcaption>
+          </figure>
+          <figure class="shot-frame" style="margin:0">
+            <div class="shot-clip shot-clip--tall">
+              <img class="shot" src="assets/shots/popup-results.png" width="700" height="1052" loading="lazy"
+                   alt="The Results tab, comparing views per day before and after each relist." />
+            </div>
+            <figcaption>
+              <strong>Results — did it actually help?</strong>
+              Views per day before and after each relist, with a plain “not improving” flag instead of a chart to interpret.
+            </figcaption>
+          </figure>
+        </div>
+
+        <div class="center" style="margin-top:34px">
+          <a class="btn btn--ghost" href="demo/">Click through the real popup →</a>
         </div>
       </div>
     </section>
 
-    <!-- Good to know -->
-    <section class="wrap" style="padding-top:8px">
-      <div class="notice">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
-        <p>
-          <strong>Good to know:</strong> Vinted has no one-tap relist, so a relist is a
-          <em>clone</em> — Novalyn creates the copy and then deletes the original, saving a full
-          backup first. Use it on <strong>your own account</strong>, at a human pace, and keep
-          batches small. Novalyn stops the moment Vinted asks for verification.
-        </p>
+    <!-- How it works -->
+    <section class="section section--soft" id="how">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Three steps, one afternoon saved</h2>
+          <p>From your wardrobe to freshly relisted ads.</p>
+        </div>
+        <div class="steps">
+          <div class="step">
+            <div class="num"></div>
+            <h3>Fetch your listings</h3>
+            <p>Open Vinted and click <strong>Fetch</strong>. Novalyn imports your own wardrobe with photos, prices and statuses.</p>
+          </div>
+          <div class="step">
+            <div class="num"></div>
+            <h3>Pick and relist</h3>
+            <p>Filter by status or views, search by title, tick what you want, optionally apply a price step, and press <strong>Relist</strong>.</p>
+          </div>
+          <div class="step">
+            <div class="num"></div>
+            <h3>Check the result</h3>
+            <p>Watch each job in the Batch tab. Anything unexpected is in the Archive, and the Results tab tells you whether it helped.</p>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -113,71 +288,62 @@
         <div class="grid grid--3">
           <article class="card">
             <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg></span>
-            <h3>One-click bulk relist</h3>
-            <p>Import your listings, tick the ones you want, and Novalyn works through them one by one with progress, pause, resume and cancel.</p>
+            <h3>Bulk relist, one by one</h3>
+            <p>Import your listings, tick the ones you want, and Novalyn works through them with progress, pause, resume and cancel.</p>
           </article>
           <article class="card">
             <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></span>
             <h3>Every detail copied</h3>
-            <p>Photos re-uploaded, plus title, description, category, brand, size, colour, condition and category attributes — exactly as Vinted stores them. Only the price can change.</p>
+            <p>Photos re-uploaded, plus title, description, category, brand, size, colour, condition and category attributes. Only the price can change.</p>
           </article>
           <article class="card">
             <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M3 21h18"/></svg></span>
             <h3>Archive before delete</h3>
-            <p>A complete backup of every item is saved before anything is removed. If a listing goes wrong, restore it to your list in one click.</p>
+            <p>A complete backup of every item is saved before anything is removed. If a listing goes wrong, restore it in one click.</p>
           </article>
           <article class="card">
             <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span>
-            <h3>Runs in the background</h3>
-            <p>No new tabs, no page jumps. Novalyn works through Vinted's own web API from the page you already have open, so you can keep browsing.</p>
+            <h3>Runs in your own tab</h3>
+            <p>No new tabs, no page jumps, no password to hand over. Novalyn works through Vinted's own web API from the page you already have open.</p>
           </article>
           <article class="card">
             <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
-            <h3>Scheduled relisting</h3>
-            <p>Optional rules by age, status, cooldown and price stepping. Novalyn prepares a plan and waits for your approval before it runs.</p>
+            <h3>Scheduled — but not unsupervised</h3>
+            <p>Rules by age, status, cooldown and price step. Novalyn prepares a run and waits for your approval, unless you turn that off.</p>
           </article>
           <article class="card">
             <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span>
-            <h3>Sales &amp; costs ledger</h3>
-            <p>A built-in Records page tracks what you made and what you spent, per day, week, month or year, in your own market's currency.</p>
+            <h3>Records, in your currency</h3>
+            <p>Sales and costs per day, week, month or year — in the currency your own market uses, never summed across markets.</p>
           </article>
         </div>
-      </div>
-    </section>
 
-    <!-- How it works -->
-    <section class="section section--soft" id="how">
-      <div class="wrap">
-        <div class="section-head">
-          <h2>Three steps, one afternoon saved</h2>
-          <p>From your wardrobe to freshly relisted listings.</p>
-        </div>
-        <div class="steps">
-          <div class="step">
-            <div class="num"></div>
-            <h3>Fetch your listings</h3>
-            <p>Open Vinted and click <strong>Fetch</strong>. Novalyn imports your wardrobe with photos, prices and statuses.</p>
-          </div>
-          <div class="step">
-            <div class="num"></div>
-            <h3>Pick and relist</h3>
-            <p>Filter by status, search by title, select what you want, optionally adjust the price, and press <strong>Relist</strong>.</p>
-          </div>
-          <div class="step">
-            <div class="num"></div>
-            <h3>Review with confidence</h3>
-            <p>Watch progress in the Batch tab. If anything looks off, every item's backup is waiting in <strong>Archive</strong>.</p>
-          </div>
+        <div class="grid grid--3" style="margin-top:20px">
+          <article class="card">
+            <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9c0-.5 0-1-.1-1.4A7 7 0 0 1 12 3Z"/></svg></span>
+            <h3>Dark Vinted, if you want it</h3>
+            <p>An optional dark appearance for Vinted's own pages. Photos keep their real colours, and it is off by default — a normal install changes nothing on Vinted.</p>
+          </article>
+          <article class="card">
+            <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 10h16M10 10v10"/></svg></span>
+            <h3>Cross-list export</h3>
+            <p>Turn a listing into an eBay draft CSV (with the item specifics each eBay site expects) or a generic CSV for anywhere else.</p>
+          </article>
+          <article class="card">
+            <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/><path d="M21 7v6h-6"/></svg></span>
+            <h3>Advice, not automation theatre</h3>
+            <p>A listing score names what is holding an ad back, and a wake-up list points at the ads worth renewing. It says nothing when the data is too thin.</p>
+          </article>
         </div>
       </div>
     </section>
 
     <!-- Pricing -->
-    <section class="section" id="pricing">
+    <section class="section section--soft" id="pricing">
       <div class="wrap">
         <div class="section-head">
           <h2>Simple pricing</h2>
-          <p>The first 50 relists are free. Every plan then unlocks unlimited relisting.</p>
+          <p>Install it, relist 50 items, decide afterwards. Every plan then unlocks unlimited relisting.</p>
         </div>
         <div class="plans">
           <article class="plan">
@@ -228,39 +394,75 @@
     </section>
 
     <!-- FAQ -->
-    <section class="section section--soft" id="faq">
+    <section class="section" id="faq">
       <div class="wrap">
         <div class="section-head">
           <h2>Questions, answered</h2>
+          <p>Including the ones that decide whether you should use this at all.</p>
         </div>
         <div class="faq">
           <details open>
-            <summary>Is Novalyn made by Vinted?</summary>
-            <p>No. Novalyn is an independent tool for sellers and is not affiliated with, endorsed by, or sponsored by Vinted.</p>
+            <summary>Can relisting get my Vinted account blocked?</summary>
+            <p>It can attract attention, and anyone who claims otherwise is selling you something.
+              Vinted is a machine-checked marketplace: relisting a hundred items in ten minutes
+              looks like a script, because it is one. Novalyn reduces the risk rather than
+              pretending it does not exist — it pauses between items, keeps to the limits you
+              set, stops for the day when you reach them, and <strong>stops immediately</strong>
+              if Vinted answers with a verification challenge or a “too many requests”. It then
+              waits instead of retrying into it, because retrying is what turns a warning into a
+              block. Keep batches small and use it on your own ads.</p>
           </details>
           <details>
-            <summary>How does a &ldquo;relist&rdquo; actually work?</summary>
-            <p>Vinted has no one-tap relist, so Novalyn does what you'd do by hand: it creates a copy of your listing (photos and details included), confirms it is live, then deletes the original — saving a full backup first so you can always restore it.</p>
+            <summary>Does a relist delete my views and favourites?</summary>
+            <p>Yes. The copy is a new ad, so it starts from zero. Novalyn stores the old numbers
+              so the Results tab can show what the ad did before and after — which is the only
+              way to know whether relisting is worth doing for your wardrobe.</p>
+          </details>
+          <details>
+            <summary>What happens if Vinted changes something and a relist fails?</summary>
+            <p>The batch stops and the original is still online, with its backup in the Archive.
+              Novalyn will not delete an original it could not replace — that is the single rule
+              the whole engine is built around. You will see the exact step that failed (loading
+              the original, uploading photos, publishing the copy, or the delete) in the batch
+              log.</p>
+          </details>
+          <details>
+            <summary>Is Novalyn made by Vinted?</summary>
+            <p>No. Novalyn is an independent tool for sellers and is not affiliated with, endorsed
+              by, or sponsored by Vinted.</p>
           </details>
           <details>
             <summary>Do you collect my data?</summary>
-            <p>No. There is no account and nothing about you or your listings is sent to us. The licence key is verified on your own device, and your listing data never leaves your browser. See the <a href="privacy.html">privacy policy</a>.</p>
+            <p>No. There is no account, and nothing about you or your listings is sent to us. The
+              licence key is verified on your own device and your listing data never leaves your
+              browser. See the <a href="privacy.html">privacy policy</a>.</p>
           </details>
           <details>
             <summary>Where do I get my licence key?</summary>
-            <p>It's emailed to you automatically, usually within a minute or two of payment. If you don't see it, <strong>check your spam folder</strong> — that's where it most often ends up. Paste it into the extension's licence card — the first thing on the <strong>Records</strong> page — and you're done. No login.</p>
+            <p>It's emailed automatically, usually within a minute or two of payment. If it isn't
+              there, <strong>check your spam folder</strong> — that is where it most often ends
+              up. Paste it into the licence card at the top of the <strong>Records</strong> page.
+              No login.</p>
           </details>
           <details>
             <summary>My plan renews — do I need to do anything?</summary>
-            <p>Yes, one thing. Every time a monthly or yearly plan renews, we email you a <strong>new</strong> key: paste it into the same field to keep relisting unlimited. When the previous key reaches its expiry date it stops working, and relisting pauses until the new one is pasted in (if the renewal email hasn't arrived, check your spam folder). A Lifetime licence never expires, so there's nothing to do later.</p>
+            <p>Yes, one thing. Every renewal sends a <strong>new</strong> key: paste it into the
+              same field. The previous key stops working on its expiry date, and relisting pauses
+              until the new one is in (check spam if the renewal email is missing). A Lifetime
+              licence never expires, so there is nothing to do later.</p>
           </details>
           <details>
-            <summary>What does &ldquo;Lifetime&rdquo; cover exactly?</summary>
-            <p>A Lifetime licence is one payment: the key never expires, there are no renewals, and you keep unlimited relisting for as long as Novalyn is offered and keeps working with Vinted. We can't promise that for ever, though &mdash; Vinted can change its site or its rules in a way no relisting tool can follow. If that ever happened, the extension would stop being able to relist, and this is the limit of what any one-time purchase can cover. See our <a href="terms.html">terms</a>.</p>
+            <summary>What does “Lifetime” cover exactly?</summary>
+            <p>One payment, no renewals: unlimited relisting for as long as Novalyn is offered and
+              keeps working with Vinted. We can't promise that for ever — Vinted can change its
+              site or its rules in a way no relisting tool can follow. If that ever happened, the
+              extension would stop being able to relist, and that is the limit of what a one-time
+              purchase can cover. See the <a href="terms.html">terms</a>.</p>
           </details>
           <details>
             <summary>What happens after my 50 free relists?</summary>
-            <p>Relisting pauses until you add a licence key. Your listings, records, history and archived backups stay fully available — you just can't start a new relist.</p>
+            <p>Relisting pauses until you add a licence key. Your listings, records, history and
+              archived backups stay fully available — you just cannot start a new relist.</p>
           </details>
           <details>
             <summary>Can I get a refund?</summary>
@@ -269,22 +471,44 @@
         </div>
       </div>
     </section>
+
+    <!-- Closing -->
+    <section class="band">
+      <div class="wrap">
+        <h2>Relist fifty items before you pay anything</h2>
+        <p>Install it, click Fetch, tick a handful of ads and watch the first one go through.
+          If it is not for you, uninstall it and nothing has changed on your account.</p>
+        <a class="btn btn--primary" href="https://chromewebstore.google.com/detail/novalyn-%E2%80%94-vinted-relister/flnfapmkkmegfpbakndnlgehimpfccic">Add to Chrome — free</a>
+        <a class="btn btn--ghost" href="demo/">See the popup first</a>
+      </div>
+    </section>
   </main>
 
   <footer class="site-footer">
     <div class="wrap">
-      <div class="footer-grid">
+      <div class="footer-grid footer-grid--4">
         <div>
           <a class="brand" href="index.html"><img src="assets/icon-128.png" alt="" /><span>Novalyn</span></a>
-          <p class="footer-tag">Bulk-relist your own Vinted listings — clone with photos and details intact, then remove the originals.</p>
+          <p class="footer-tag">Bulk-relist your own Vinted listings — clone with photos and details intact, confirm the copy, archive the original, then remove it.</p>
+          <p class="footer-tag" style="margin-top:10px">
+            <a href="https://chromewebstore.google.com/detail/novalyn-%E2%80%94-vinted-relister/flnfapmkkmegfpbakndnlgehimpfccic">Chrome Web Store</a>
+            &nbsp;·&nbsp; 5.0 ★
+          </p>
         </div>
         <div class="footer-col">
           <h4>Product</h4>
-          <a href="#how">How it works</a>
+          <a href="#safe">Why it is safe</a>
           <a href="#features">Features</a>
           <a href="#pricing">Pricing</a>
           <a href="#faq">FAQ</a>
+          <a href="demo/">Try the popup</a>
+        </div>
+        <div class="footer-col">
+          <h4>Guides</h4>
           <a href="relist-vinted.html">How to relist on Vinted</a>
+          <a href="vinted-advertenties-vernieuwen.html">Advertenties vernieuwen (NL)</a>
+          <a href="renouveler-annonce-vinted.html">Renouveler une annonce (FR)</a>
+          <a href="vinted-anzeige-erneuern.html">Anzeige erneuern (DE)</a>
         </div>
         <div class="footer-col">
           <h4>Company</h4>
