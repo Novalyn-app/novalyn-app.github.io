@@ -12,8 +12,17 @@
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Novalyn — relist your Vinted listings without losing the original" />
   <meta property="og:description" content="Bulk relist your own Vinted ads: photos and details copied, the copy confirmed live, the original archived — and only then removed." />
-  <meta property="og:image" content="assets/shots/popup-listings.png" />
+  <meta property="og:image" content="assets/og-card.png" />
   <meta property="og:url" content="https://novalyn-app.github.io/" />
+  <meta property="og:site_name" content="Novalyn" />
+  <meta property="og:locale" content="en_GB" />
+  <meta property="og:image:width" content="1280" />
+  <meta property="og:image:height" content="800" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Novalyn — relist your Vinted listings without losing the original" />
+  <meta name="twitter:description" content="Bulk relist your own Vinted ads: photos and details copied, the copy confirmed live, the original archived — and only then removed." />
+  <meta name="twitter:image" content="assets/og-card.png" />
+  <script src="assets/analytics.js" defer></script>
   <!--
     ============================================================
     TO KEEP IN SYNC
@@ -29,8 +38,155 @@
        src/core/licenseApi.ts of the extension repo.
     3. SCREENSHOTS: assets/shots/*.png are generated from the real popup by
        `node scripts/site-demo.mjs` in the extension repo. Do not hand-edit.
+    4. OG CARD: assets/og-card.png is store shot 1, copied by the same
+       `site:demo` run. Its real size is declared as 1280x800 - if you change
+       the shot, change those metas too.
+    5. ANALYTICS ID: assets/analytics.js ships inert. Paste the Umami website id
+       into UMAMI_WEBSITE_ID to switch counting on, and keep privacy.html in step.
     ============================================================
   -->
+
+  <!--
+    aggregateRating: the store shows 5.0 from 2 ratings. A single new rating
+    moves that number, so re-check it against the live Chrome Web Store listing
+    before every release — an outdated rating is a rich-result policy problem,
+    not a rounding error.
+  -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Novalyn",
+    "applicationCategory": "BrowserApplication",
+    "operatingSystem": "Chrome",
+    "url": "https://novalyn-app.github.io/",
+    "description": "Bulk relist your own Vinted listings. Novalyn publishes the copy, confirms it is live in your wardrobe, archives the original and only then deletes it.",
+    "inLanguage": "en",
+    "image": "https://novalyn-app.github.io/assets/og-card.png",
+    "offers": [
+      {
+        "@type": "Offer",
+        "name": "Monthly",
+        "price": "4.00",
+        "priceCurrency": "EUR",
+        "url": "https://buy.stripe.com/cNi9AT2Gc8ER0JR6e2dIA00",
+        "availability": "https://schema.org/InStock"
+      },
+      {
+        "@type": "Offer",
+        "name": "Yearly",
+        "price": "40.00",
+        "priceCurrency": "EUR",
+        "url": "https://buy.stripe.com/eVq6oHfsY3kx0JR31QdIA01",
+        "availability": "https://schema.org/InStock"
+      },
+      {
+        "@type": "Offer",
+        "name": "Lifetime",
+        "price": "80.00",
+        "priceCurrency": "EUR",
+        "url": "https://buy.stripe.com/9B6dR9eoU08l64b7i6dIA02",
+        "availability": "https://schema.org/InStock"
+      }
+    ],
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "5.0",
+      "ratingCount": "2",
+      "bestRating": "5"
+    }
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "inLanguage": "en",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Can relisting get my Vinted account blocked?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "It can attract attention, and anyone who claims otherwise is selling you something. Vinted is a machine-checked marketplace: relisting a hundred items in ten minutes looks like a script, because it is one. Novalyn reduces the risk rather than pretending it does not exist — it pauses between items, keeps to the limits you set, stops for the day when you reach them, and stops immediately if Vinted answers with a verification challenge or a “too many requests”. It then waits instead of retrying into it, because retrying is what turns a warning into a block. Keep batches small and use it on your own ads."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does a relist delete my views and favourites?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. The copy is a new ad, so it starts from zero. Novalyn stores the old numbers so the Results tab can show what the ad did before and after — which is the only way to know whether relisting is worth doing for your wardrobe."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What happens if Vinted changes something and a relist fails?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The batch stops and the original is still online, with its backup in the Archive. Novalyn will not delete an original it could not replace — that is the single rule the whole engine is built around. You will see the exact step that failed (loading the original, uploading photos, publishing the copy, or the delete) in the batch log."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is Novalyn made by Vinted?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. Novalyn is an independent tool for sellers and is not affiliated with, endorsed by, or sponsored by Vinted."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Do you collect my data?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. There is no account, and nothing about you or your listings is sent to us. The licence key is verified on your own device and your listing data never leaves your browser. See the privacy policy at https://novalyn-app.github.io/privacy.html."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Where do I get my licence key?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "It's emailed automatically, usually within a minute or two of payment. If it isn't there, check your spam folder — that is where it most often ends up. Paste it into the licence card at the top of the Records page. No login."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "My plan renews — do I need to do anything?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, one thing. Every renewal sends a new key: paste it into the same field. The previous key stops working on its expiry date, and relisting pauses until the new one is in (check spam if the renewal email is missing). A Lifetime licence never expires, so there is nothing to do later."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What does “Lifetime” cover exactly?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "One payment, no renewals: unlimited relisting for as long as Novalyn is offered and keeps working with Vinted. We can't promise that for ever — Vinted can change its site or its rules in a way no relisting tool can follow. If that ever happened, the extension would stop being able to relist, and that is the limit of what a one-time purchase can cover. See the terms at https://novalyn-app.github.io/terms.html."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What happens after my 50 free relists?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Relisting pauses until you add a licence key. Your listings, records, history and archived backups stay fully available — you just cannot start a new relist."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I get a refund?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. See the refund policy at https://novalyn-app.github.io/refund.html for the window and how to ask."
+        }
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -509,6 +665,8 @@
           <a href="vinted-advertenties-vernieuwen.html">Advertenties vernieuwen (NL)</a>
           <a href="renouveler-annonce-vinted.html">Renouveler une annonce (FR)</a>
           <a href="vinted-anzeige-erneuern.html">Anzeige erneuern (DE)</a>
+          <a href="republicar-anuncios-vinted.html">Republicar anuncios (ES)</a>
+          <a href="ripubblicare-annunci-vinted.html">Ripubblicare annunci (IT)</a>
         </div>
         <div class="footer-col">
           <h4>Company</h4>

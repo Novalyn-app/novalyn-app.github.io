@@ -298,6 +298,10 @@ input:focus {
   color: var(--nv-muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  /* A German compound label ("Durchschnittsverkauf") is one word and cannot
+     wrap, so it used to spill into the next tile at a narrow window. Break it
+     rather than clip it: the grid columns are fixed-width. */
+  overflow-wrap: anywhere;
 }
 .tile-value {
   font-size: 22px;
