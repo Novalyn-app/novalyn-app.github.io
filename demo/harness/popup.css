@@ -1011,6 +1011,39 @@ input[type='number'] {
   flex-shrink: 0;
 }
 
+/* Bulk price change preview: one line per ad, old → new. */
+.price-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 190px;
+  overflow-y: auto;
+  margin: 4px 0 6px;
+}
+
+.price-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+
+.price-row-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--nv-text);
+}
+
+.price-row-delta {
+  flex-shrink: 0;
+  color: var(--nv-muted);
+  font-variant-numeric: tabular-nums;
+}
+
 /* The one rule that matters: never relist a Sold item. */
 .onboarding-warn {
   margin-top: 3px;
