@@ -1003,6 +1003,14 @@ input[type='number'] {
   color: var(--nv-text);
 }
 
+/* The rating prompt reuses the first-run card; only its button row is new. */
+.review-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
 /* The one rule that matters: never relist a Sold item. */
 .onboarding-warn {
   margin-top: 3px;
