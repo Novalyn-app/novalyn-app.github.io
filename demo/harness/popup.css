@@ -1037,6 +1037,16 @@ input[type='number'] {
   white-space: nowrap;
   color: var(--nv-text);
 }
+/* The title is the way into Vinted's own edit page for that ad. */
+.price-row-title a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-color: var(--nv-border-strong);
+}
+.price-row-title a:hover {
+  color: var(--nv-violet);
+}
 
 .price-row-delta {
   flex-shrink: 0;

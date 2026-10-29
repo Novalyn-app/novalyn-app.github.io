@@ -1070,7 +1070,8 @@ td.num.neg {
 
 /* ---- activity amount editing ---- */
 
-.activity-amount {
+.activity-amount,
+.activity-cost {
   width: 88px;
   flex: 0 0 auto;
   font: inherit;
@@ -1082,6 +1083,11 @@ td.num.neg {
   color: var(--nv-text);
   text-align: right;
   font-variant-numeric: tabular-nums;
+}
+/* The cost is optional and often unknown: quieter than the amount it explains. */
+.activity-cost::placeholder {
+  color: var(--nv-muted);
+  font-style: italic;
 }
 .activity-reset {
   flex: 0 0 auto;
