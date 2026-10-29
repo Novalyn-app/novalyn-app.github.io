@@ -858,8 +858,7 @@ td.num.neg {
 }
 
 /* "Do not book" on a single row: quiet, because it describes one row and not a
-   batch — the selection-level button is the loud one. */
-.activity-skip {
+   batch — the selection-level button is the loud one. */.activity-skip {
   flex: 0 0 auto;
   width: 22px;
   height: 22px;
@@ -879,6 +878,39 @@ td.num.neg {
   color: var(--nv-danger);
   background: var(--nv-danger-bg);
   outline: none;
+}
+
+/* Where the queue comes from: one quiet line above it, and a way to ask again. */
+.activity-sync {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 8px;
+}
+
+.activity-sync-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--nv-muted);
+}
+
+/* Rows the user set aside: the only way back, so it has to be visible. */
+.activity-dismissed {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--nv-border);
+  font-size: 12px;
+  color: var(--nv-muted);
+}
+
+.activity-dismissed span {
+  flex: 1;
+  min-width: 0;
 }
 .activity-item-amount {
   color: var(--nv-muted);
