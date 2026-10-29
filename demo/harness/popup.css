@@ -2033,6 +2033,28 @@ body::-webkit-scrollbar-thumb:hover {
 .checklist li.done {
   color: var(--nv-text);
 }
+/* Each step is a button: a to-do you cannot act on is a to-do you skip. The
+   button carries the row layout so the list looks unchanged. */
+.checklist-step {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.checklist-step:hover,
+.checklist-step:focus-visible {
+  color: var(--nv-text);
+  outline: none;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
 .checklist-mark {
   display: inline-block;
   width: 12px;

@@ -275,6 +275,14 @@ input:focus {
   gap: 12px;
   margin-bottom: 16px;
 }
+/* The month in one line, above the tiles: the sentence a seller repeats. */
+.report-line {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--nv-text);
+}
+
 .tile {
   background: var(--nv-surface);
   border: 1px solid var(--nv-border);
