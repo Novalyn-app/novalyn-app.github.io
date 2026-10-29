@@ -285,6 +285,20 @@ input:focus {
   gap: 2px;
   box-shadow: var(--nv-shadow-sm);
 }
+
+/* A figure you can open: clicking "Costs" drops the table to exactly the entries
+   that make it. A total nobody can trace is how a wrong number survives. */
+.tile[data-tile] {
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tile[data-tile]:hover,
+.tile[data-tile]:focus-visible {
+  border-color: var(--nv-violet);
+  box-shadow: var(--nv-shadow), var(--nv-ring);
+  outline: none;
+}
 .tile-strong {
   background: var(--nv-grad);
   border-color: transparent;
@@ -841,6 +855,30 @@ td.num.neg {
   font-size: 11px;
   font-weight: 400;
   color: var(--muted, #6b7280);
+}
+
+/* "Do not book" on a single row: quiet, because it describes one row and not a
+   batch — the selection-level button is the loud one. */
+.activity-skip {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: none;
+  color: var(--nv-muted);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.activity-skip:hover,
+.activity-skip:focus-visible {
+  border-color: var(--nv-border-strong);
+  color: var(--nv-danger);
+  background: var(--nv-danger-bg);
+  outline: none;
 }
 .activity-item-amount {
   color: var(--nv-muted);
