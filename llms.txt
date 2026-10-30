@@ -37,8 +37,8 @@ or sponsored by Vinted.
 
 ## Facts
 
-- Free tier: 50 successful relists per install, counted once and not reset by
-  clearing history.
+- Free tier: 50 successful relists per install, then 20 relists per rolling 30 days.
+  Neither is reset by clearing history; both are mirrored to Chrome sync.
 - Pricing: €4 per month, €40 per year, or €80 once (lifetime). Prices include VAT.
   Payment and cards are handled by Stripe; the licence key is emailed automatically.
 - Requirements: desktop Chrome, a signed-in Vinted account, and the seller's own ads.
