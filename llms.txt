@@ -1,0 +1,57 @@
+# Novalyn
+
+> Novalyn is a Chrome extension that relists a Vinted seller's own listings in bulk.
+> It publishes the copy first, archives the original, and only then deletes the old
+> ad — the reverse of the delete-first approach most relisting tools use.
+
+Novalyn is an independent tool for sellers. It is not affiliated with, endorsed by
+or sponsored by Vinted.
+
+## What it is
+
+- A Chrome extension (Manifest V3), installed from the Chrome Web Store:
+  https://chromewebstore.google.com/detail/novalyn-%E2%80%94-vinted-relister/flnfapmkkmegfpbakndnlgehimpfccic
+- Works on 29 Vinted marketplaces, and shows amounts in each market's own currency.
+- Runs in the tab the seller is already signed in to: no account, no password, no
+  separate login.
+- Relists one ad at a time with a pause between items, keeps to the seller's own
+  hourly and daily limits, and stops on a verification challenge, an HTTP 429 or a
+  Vinted restriction instead of retrying into it.
+- Imports the listings from the seller's own wardrobe, and refuses any page that is
+  not the wardrobe of the account that is signed in.
+- Also provides: per-ad results (views per day before and after a relist), a private
+  sales-and-costs ledger with CSV import/export, scheduled relisting that waits for
+  approval, an archive of every original with a full API backup, and a bulk price
+  list to paste into Vinted.
+
+## What it does not do
+
+- It does not promise more views. A relist is a new ad, so it starts from zero views
+  and favourites; whether that helps depends on the ad, the photos and the price.
+  Novalyn measures the before/after rate so the seller can judge it on their own ads.
+- It is not a Vinted feature, and it is not a bot farm: it drives the seller's own
+  signed-in session at a human pace.
+- The shipped build does not edit prices through Vinted's API. It produces a price
+  list instead, because a price change requires re-sending the whole advert.
+- It does not collect telemetry, and it has no server that sees the seller's data.
+
+## Facts
+
+- Free tier: 50 successful relists per install, counted once and not reset by
+  clearing history.
+- Pricing: €4 per month, €40 per year, or €80 once (lifetime). Prices include VAT.
+  Payment and cards are handled by Stripe; the licence key is emailed automatically.
+- Requirements: desktop Chrome, a signed-in Vinted account, and the seller's own ads.
+- Data: listings, history, archive, records and settings live in the browser's local
+  storage. No account, no analytics, no telemetry.
+- Privacy policy: https://novalyn-app.github.io/privacy.html
+- Refund policy (14 days): https://novalyn-app.github.io/refund.html
+
+## Pages
+
+- [How to relist on Vinted, without losing the original](https://novalyn-app.github.io/relist-vinted.html)
+- [Homepage and pricing](https://novalyn-app.github.io/)
+- [Questions, answered](https://novalyn-app.github.io/#faq)
+- [Privacy policy](https://novalyn-app.github.io/privacy.html)
+- [Terms of service](https://novalyn-app.github.io/terms.html)
+- [Refund and cancellation policy](https://novalyn-app.github.io/refund.html)

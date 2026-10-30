@@ -47,10 +47,12 @@
   -->
 
   <!--
-    aggregateRating: the store shows 5.0 from 2 ratings. A single new rating
-    moves that number, so re-check it against the live Chrome Web Store listing
-    before every release — an outdated rating is a rich-result policy problem,
-    not a rounding error.
+    aggregateRating: the store shows 5.0 from 2 ratings, and the hero's eyebrow
+    says the same thing on the page. A single new rating moves both numbers, so
+    re-check them against the live Chrome Web Store listing before every release —
+    an outdated rating is a rich-result policy problem, not a rounding error, and
+    markup that disagrees with the visible page is exactly what that policy is
+    about.
   -->
   <script type="application/ld+json">
   {
@@ -104,6 +106,30 @@
     "@type": "FAQPage",
     "inLanguage": "en",
     "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Can I relist all my Vinted items at once?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Novalyn reads the listings from the wardrobe you are already signed in to; relist all of them, or tick the ones you want. It still goes one at a time with a pause between, because a burst of relists is what a script looks like."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does relisting actually get more views?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "It can, but nobody can promise it. A relist is a new ad, so it starts at the top of the wardrobe and gets its own first days — that is the whole mechanism. Whether your ad does better the second time depends on the photos, the price and the demand. Novalyn measures views per day before and after each relist, so you can see it on your own ads instead of taking anyone's word for it."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is there a free way to relist my Vinted listings?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "For the first 50 relists, yes: install it and relist up to 50 items without paying or creating an account. After that a licence key unlocks unlimited relisting — €4 a month, €40 a year or €80 once. The manual alternative is free too: Vinted has no one-tap relist, so it means deleting the ad and uploading it again, photos and text included."
+        }
+      },
       {
         "@type": "Question",
         "name": "Can relisting get my Vinted account blocked?",
@@ -212,13 +238,14 @@
     <section class="hero">
       <div class="wrap hero-grid">
         <div>
-          <span class="eyebrow"><span class="dot"></span> 5.0 ★ on the Chrome Web Store · 50 relists free</span>
+          <span class="eyebrow"><span class="dot"></span> 5.0 ★ from 2 ratings on the Chrome Web Store · 50 relists free</span>
           <h1>Relist your Vinted ads — <span class="grad">without losing the original first.</span></h1>
           <p class="lede">
-            Novalyn clones your own listings in bulk: photos, title, description, category,
-            brand and size. Each copy is published first, the original is archived, and only
-            then is the old ad removed. If Vinted answers with something unclear, Novalyn
-            checks your wardrobe instead of guessing.
+            Novalyn is a Chrome extension that relists your own Vinted ads in bulk.
+            It clones the photos, title, description, category, brand and size of each
+            ad, publishes the copy first, archives the original, and only then removes
+            the old ad. If Vinted answers with something unclear, Novalyn checks your
+            wardrobe instead of guessing.
           </p>
           <div class="cta-row">
             <a class="btn btn--primary" href="https://chromewebstore.google.com/detail/novalyn-%E2%80%94-vinted-relister/flnfapmkkmegfpbakndnlgehimpfccic">Add to Chrome — free</a>
@@ -557,6 +584,34 @@
           <p>Including the ones that decide whether you should use this at all.</p>
         </div>
         <div class="faq">
+          <details>
+            <summary>Can I relist all my Vinted items at once?</summary>
+            <p>
+              Yes. Novalyn reads the listings from the wardrobe you are already signed in to; relist
+              all of them, or tick the ones you want. It still goes one at a time with a pause
+              between, because a burst of relists is what a script looks like.
+            </p>
+          </details>
+          <details>
+            <summary>Does relisting actually get more views?</summary>
+            <p>
+              It can, but nobody can promise it. A relist is a new ad, so it starts at the top of
+              the wardrobe and gets its own first days — that is the whole mechanism. Whether your
+              ad does better the second time depends on the photos, the price and the demand.
+              Novalyn measures views per day before and after each relist, so you can see it on your
+              own ads instead of taking anyone's word for it.
+            </p>
+          </details>
+          <details>
+            <summary>Is there a free way to relist my Vinted listings?</summary>
+            <p>
+              For the first 50 relists, yes: install it and relist up to 50 items without paying or
+              creating an account. After that a licence key unlocks unlimited relisting — €4 a
+              month, €40 a year or €80 once. The manual alternative is free too: Vinted has no
+              one-tap relist, so it means deleting the ad and uploading it again, photos and text
+              included.
+            </p>
+          </details>
           <details open>
             <summary>Can relisting get my Vinted account blocked?</summary>
             <p>It can attract attention, and anyone who claims otherwise is selling you something.
